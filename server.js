@@ -14,3 +14,11 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+app.get('/cabinet', (req, res) => {
+  res.sendFile(require('path').join(__dirname, 'public', 'cabinet.html'));
+});
+
+app.get('/cabinet', (req, res) => {
+  res.sendFile(require('path').join(__dirname, 'public', 'cabinet.html'));
+});
