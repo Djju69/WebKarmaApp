@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KarmaSystem — Сервис лояльности</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-img">KS</div>
+          <span>KarmaSystem</span>
+        </div>
+        <nav>
+          <ul>
+            <li><a href="#cards">Карточки</a></li>
+            <li><a href="#coupons">Купоны</a></li>
+            <li><a href="#reviews">Отзывы</a></li>
+            <li><a href="#account">Личный кабинет</a></li>
+          </ul>
+        </nav>
+        <a href="#partner" class="cta-button">Стать партнёром</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>KarmaSystem — выгодно всем</h1>
+      <p>Скидки пользователям. Поток клиентов партнёрам.</p>
+      <div class="hero-buttons">
+        <a href="#login" class="hero-button primary-btn">Личный кабинет</a>
+        <a href="#partner" class="hero-button secondary-btn">Стать партнёром</a>
+        <a href="#get-card" class="hero-button secondary-btn">Получить карту скидок</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cards Section -->
+  <section class="cards-section" id="cards">
+    <div class="container">
+      <h2 class="section-title">Популярные заведения</h2>
+      <div class="cards-grid">
+        <!-- Card 1 -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Кофейня "У Ашота"</h3>
+            <span class="discount-badge">-15%</span>
+          </div>
+          <p class="card-category">Кафе · Центральный район</p>
+          <p>Кофе, выпечка, десерты. Уютная атмосфера для работы и встреч.</p>
+          <div class="card-actions">
+            <button class="card-btn qr-btn">Сканировать QR</button>
+            <button class="card-btn review-btn">Отзывы</button>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Ресторан "МариВанна"</h3>
+            <span class="discount-badge">-10%</span>
+          </div>
+          <p class="card-category">Ресторан · Северный район</p>
+          <p>Европейская и русская кухня. Банкеты и мероприятия.</p>
+          <div class="card-actions">
+            <button class="card-btn qr-btn">Сканировать QR</button>
+            <button class="card-btn review-btn">Отзывы</button>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Фитнес-центр "Атлет"</h3>
+            <span class="discount-badge">-20%</span>
+          </div>
+          <p class="card-category">Спорт · Западный район</p>
+          <p>Тренажерный зал, групповые занятия, бассейн и спа-зона.</p>
+          <div class="card-actions">
+            <button class="card-btn qr-btn">Сканировать QR</button>
+            <button class="card-btn review-btn">Отзывы</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits-section" id="coupons">
+    <div class="container">
+      <h2 class="section-title">Выгода для пользователей</h2>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">📍</div>
+          <h3 class="benefit-title">Найди место рядом</h3>
+          <p class="benefit-description">Открой для себя новые заведения с выгодными скидками рядом с тобой.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">📱</div>
+          <h3 class="benefit-title">Покажи QR</h3>
+          <p class="benefit-description">Просто покажи QR-код кассиру и получи скидку моментально.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">🔄</div>
+          <h3 class="benefit-title">Возвращайся в любимые места</h3>
+          <p class="benefit-description">Копи баллы за каждое посещение и получай еще больше выгод.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Partners Benefits -->
+  <section class="benefits-section">
+    <div class="container">
+      <h2 class="section-title">Выгода для партнёров</h2>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">👥</div>
+          <h3 class="benefit-title">Больше гостей</h3>
+          <p class="benefit-description">Привлекайте новых клиентов через платформу и увеличивайте поток посетителей.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">🎯</div>
+          <h3 class="benefit-title">Простые скидки</h3>
+          <p class="benefit-description">Настраивайте гибкую систему скидок и акций без сложных интеграций.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">📊</div>
+          <h3 class="benefit-title">Аналитика и контроль</h3>
+          <p class="benefit-description">Отслеживайте эффективность акций и получайте детальную аналитику по клиентам.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews Section -->
+  <section class="reviews-section" id="reviews">
+    <div class="container">
+      <h2 class="section-title">Отзывы</h2>
+      <div class="reviews-slider">
+        <div class="review-card">
+          <p class="review-text">"С помощью KarmaSystem увеличили посещаемость на 25% за первый месяц. Отличная платформа!"</p>
+          <div class="review-author">
+            Ольга, ресторан "МариВанна" 
+            <span class="review-verified">Проверено QR</span>
+          </div>
+        </div>
+        <div class="review-card">
+          <p class="review-text">"Как пользователь, я экономлю около 3000 рублей в месяц. Удобно, что все скидки в одном приложении."</p>
+          <div class="review-author">
+            Михаил 
+            <span class="review-verified">Проверено QR</span>
+          </div>
+        </div>
+        <div class="review-card">
+          <p class="review-text">"Простая интеграция, понятный интерфейс. Наши постоянные клиенты в восторге от системы лояльности."</p>
+          <div class="review-author">
+            Антон, фитнес-центр "Атлет" 
+            <span class="review-verified">Проверено QR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="copyright">© 2025 KarmaSystem</div>
+        <div class="footer-links">
+          <a href="#policy">Политика</a>
+          <a href="#contacts">Контакты</a>
+          <a href="#support">Поддержка</a>
+        </div>
+        <div class="language-switcher">
+          <button class="language-btn active">RU</button>
+          <button class="language-btn">EN</button>
+          <button class="language-btn">VI</button>
+          <button class="language-btn">KR</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>
