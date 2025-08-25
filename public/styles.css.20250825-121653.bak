@@ -448,3 +448,13 @@ nav a:hover{color:var(--text-primary)}
 @media (max-width:900px){.stats-grid{grid-template-columns:1fr 1fr}.charts-grid{grid-template-columns:1fr}}
 @media (max-width:640px){.dashboard-layout{grid-template-columns:1fr}.sidebar{position:sticky;top:0;z-index:2}}
 /* === end MONO LIGHT === */
+/* === KS-CARDS-UTILS (не удалять метку) === */
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin:10px 0}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.form-actions{display:flex;gap:10px;margin-top:10px}
+.right{text-align:right}
+.link{color:#0F1115;text-decoration:underline}
+.chip{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:800;font-size:12px}
+.chip.ok{background:#111;color:#fff}
+.chip.warn{background:#E5E7EB;color:#111}
+.chip.muted{background:#F3F6FA;color:#6B7280}

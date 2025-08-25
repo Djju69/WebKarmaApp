@@ -448,3 +448,90 @@ nav a:hover{color:var(--text-primary)}
 @media (max-width:900px){.stats-grid{grid-template-columns:1fr 1fr}.charts-grid{grid-template-columns:1fr}}
 @media (max-width:640px){.dashboard-layout{grid-template-columns:1fr}.sidebar{position:sticky;top:0;z-index:2}}
 /* === end MONO LIGHT === */
+/* === KS-CARDS-UTILS (не удалять метку) === */
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin:10px 0}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.form-actions{display:flex;gap:10px;margin-top:10px}
+.right{text-align:right}
+.link{color:#0F1115;text-decoration:underline}
+.chip{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:800;font-size:12px}
+.chip.ok{background:#111;color:#fff}
+.chip.warn{background:#E5E7EB;color:#111}
+.chip.muted{background:#F3F6FA;color:#6B7280}
+/* === MONO LIGHT FIX (поверх существующего) === */
+:root{
+  --bg-primary:#ffffff; --text-primary:#111111; --text-secondary:#6B7280;
+  --accent-primary:#111111; --card-bg:#ffffff; --line:#E5E7EB; --shadow:0 6px 24px rgba(17,17,17,.06);
+}
+html,body{background:#fff;color:#111;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+.site-header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+.header-content{display:flex;align-items:center;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+.brand-logo{width:32px;height:32px;object-fit:contain}
+.brand-name{font-weight:800;letter-spacing:.2px}
+#mainNav ul{display:flex;gap:20px;list-style:none;margin:0;padding:0}
+#mainNav a{text-decoration:none;color:#111;opacity:.8}
+#mainNav a:hover{opacity:1}
+.nav-toggle{display:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 10px}
+@media (max-width:760px){
+  .nav-toggle{display:block;margin-left:auto}
+  .site-header #mainNav{display:none}
+  .site-header.open #mainNav{display:block}
+  #mainNav ul{flex-direction:column;gap:10px;padding:10px 0}
+}
+.hero{padding:64px 0;text-align:center}
+.hero h1{font-size:40px;font-weight:800;margin:0 0 10px}
+.hero p{color:var(--text-secondary);margin:0 0 20px}
+.hero-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.hero-button{padding:12px 18px;border-radius:10px;font-weight:700;text-decoration:none;border:1px solid #111}
+.primary-btn{background:#111;color:#fff}
+.secondary-btn{background:#fff;color:#111}
+.cards-section{padding:40px 0}
+.section-title{font-size:26px;font-weight:800;margin-bottom:16px;text-align:center}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{background:var(--card-bg);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.card-header{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}
+.card-title{font-weight:800}
+.discount-badge{background:#111;color:#fff;padding:2px 8px;border-radius:999px;font-weight:800}
+.card-category{color:var(--text-secondary);font-size:14px;margin-bottom:6px}
+.reviews-section{padding:40px 0}
+.reviews-slider{display:flex;gap:16px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.review-card{min-width:280px;border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;box-shadow:var(--shadow)}
+.footer-content{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-top:1px solid var(--line);gap:10px;flex-wrap:wrap}
+.footer-links{display:flex;gap:12px}
+.btn{cursor:pointer;border:1px solid #111;background:#fff;color:#111;border-radius:10px;padding:8px 12px;font-weight:700;text-decoration:none}
+.btn-primary{background:#111;color:#fff;border-color:#111}
+.btn-ghost{background:#fff;color:#111}
+.input,.select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.dashboard-body{background:#fff;color:#111}
+.dashboard-layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.sidebar{background:#fff;border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column}
+.sidebar-nav{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.nav-item{padding:10px 12px;border-radius:10px;color:#111;text-decoration:none}
+.nav-item.active{background:#111;color:#fff}
+.sidebar-footer{margin-top:auto;color:var(--text-secondary);font-size:12px}
+.dashboard-main{padding:20px 24px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.topbar-title{font-size:22px;font-weight:800}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.stat-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.stat-label{color:var(--text-secondary);font-size:14px;margin-bottom:6px}
+.stat-value{font-size:24px;font-weight:800}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.chart-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.map-placeholder{height:280px;border:1px dashed var(--line);border-radius:12px}
+.table-wrapper{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th,.data-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left}
+.right{text-align:right}.hidden{display:none}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:800;color:#111;background:#fff}
+.badge.ok{background:#111;color:#fff;border-color:#111}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin:10px 0}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.form-actions{display:flex;gap:10px;margin-top:10px}
+.chip{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:800;font-size:12px}
+.chip.ok{background:#111;color:#fff}.chip.warn{background:#E5E7EB;color:#111}.chip.muted{background:#F3F6FA;color:#6B7280}
+@media (max-width:1100px){.charts-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.dashboard-layout{grid-template-columns:200px 1fr}}
+@media (max-width:720px){.dashboard-layout{grid-template-columns:1fr}.sidebar{position:sticky;top:0;z-index:5}}

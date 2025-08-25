@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>KarmaSystem — Сервис лояльности</title>
+  <link rel="icon" href="/assets/logo.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-content">
+      <a class="brand" href="/">
+        <img src="/assets/logo.png" onerror="this.onerror=null;this.src='/assets/logo.svg';" alt="KarmaSystem" class="brand-logo"/>
+        <span class="brand-name">KarmaSystem</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Меню">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav id="mainNav">
+        <ul>
+          <li><a href="#how">Как это работает</a></li>
+          <li><a href="#benefits">Преимущества</a></li>
+          <li><a href="#reviews">Отзывы</a></li>
+          <li><a href="#partners">Партнёры</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="/cabinet" data-cabinet>Личный кабинет</a></li>
+        </ul>
+      </nav>
+
+      <a href="/cabinet" data-cabinet class="btn btn-primary hide-sm">Подключить заведение</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <h1>Сервис лояльности в один клик</h1>
+        <p>Скидки и бонусы гостям. Новый поток покупателей партнёрам. Запуск за 10 минут — без сложной интеграции.</p>
+        <div class="hero-actions">
+          <a href="/cabinet" data-cabinet class="btn btn-primary">Начать бесплатно</a>
+          <a href="#how" class="btn btn-ghost">Как это работает</a>
+        </div>
+        <div class="hero-badges">
+          <span>⚡ Быстрый старт</span>
+          <span>🛡️ Защищённые QR</span>
+          <span>📊 Живая аналитика</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <img src="/assets/logo.png" onerror="this.onerror=null;this.src='/assets/logo.svg';" alt="KarmaSystem"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="steps" id="how">
+    <div class="container">
+      <h2 class="section-title">Как это работает</h2>
+      <div class="steps-grid">
+        <div class="step"><div class="step-num">1</div><h3>Создайте карточку</h3><p>Опишите заведение, скидки и правила — система готова.</p></div>
+        <div class="step"><div class="step-num">2</div><h3>Разместите QR</h3><p>Гости сканируют QR и моментально получают скидку.</p></div>
+        <div class="step"><div class="step-num">3</div><h3>Растите выручку</h3><p>Смотрите конверсию, чек и экономию в кабинете.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits -->
+  <section class="benefits" id="benefits">
+    <div class="container">
+      <h2 class="section-title">Почему KarmaSystem</h2>
+      <div class="cards-grid">
+        <div class="card"><div class="card-ic">🎯</div><h3 class="card-title">Простые скидки</h3><p>Акции и купоны без IT — всё из коробки.</p></div>
+        <div class="card"><div class="card-ic">📈</div><h3 class="card-title">Измеримый рост</h3><p>Конверсия, средний чек, выручка — всегда под рукой.</p></div>
+        <div class="card"><div class="card-ic">🔐</div><h3 class="card-title">Цифровая подпись</h3><p>Защита QR от подделок и накруток.</p></div>
+        <div class="card"><div class="card-ic">⚙️</div><h3 class="card-title">Интеграции</h3><p>CRM/кассы и API для выгрузки данных.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews -->
+  <section class="testimonials" id="reviews">
+    <div class="container">
+      <h2 class="section-title">Отзывы</h2>
+      <div class="reviews">
+        <div class="review"><p>«Посещаемость +25% за месяц. Запуск занял 10 минут.»</p><div class="review-author">Ольга, «МариВанна»</div></div>
+        <div class="review"><p>«Экономлю ~3000 ₽ в месяц, все скидки в одном месте.»</p><div class="review-author">Михаил, гость</div></div>
+        <div class="review"><p>«Наконец-то понятная аналитика по акциям и купонам.»</p><div class="review-author">Антон, «Атлет»</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Partners -->
+  <section class="partners" id="partners">
+    <div class="container">
+      <h2 class="section-title">Партнёры</h2>
+      <div class="brand-row">
+        <div class="brand-badge">Vanil</div>
+        <div class="brand-badge">Mariv</div>
+        <div class="brand-badge">Atlet</div>
+        <div class="brand-badge">Kakao</div>
+        <div class="brand-badge">Retro</div>
+      </div>
+      <div class="center mt-16">
+        <a href="/cabinet" data-cabinet class="btn btn-primary">Стать партнёром</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <h2 class="section-title">FAQ</h2>
+      <div class="faq-list">
+        <details class="faq-item" open><summary>Сколько стоит подключение?</summary><div class="faq-a">Старт бесплатно, далее — гибкие тарифы.</div></details>
+        <details class="faq-item"><summary>Нужна ли интеграция с кассой?</summary><div class="faq-a">Нет. Достаточно QR-кодов. Интеграции — по желанию.</div></details>
+        <details class="faq-item"><summary>Как защищены купоны?</summary><div class="faq-a">QR с цифровой подписью + серверная валидация.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA strip -->
+  <section class="cta-strip">
+    <div class="container cta-strip-inner">
+      <div class="cta-text"><h3>Готовы подключиться?</h3><p>Запустите программу лояльности уже сегодня — это бесплатно.</p></div>
+      <div class="cta-actions">
+        <a href="/cabinet" data-cabinet class="btn btn-primary">Подключить заведение</a>
+        <a href="#benefits" class="btn btn-ghost">Узнать подробнее</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-left">
+        <a class="brand sm" href="/">
+          <img src="/assets/logo.png" onerror="this.onerror=null;this.src='/assets/logo.svg';" alt="KarmaSystem" class="brand-logo"/>
+          <span class="brand-name">KarmaSystem</span>
+        </a>
+        <div class="muted">© 2025 KarmaSystem</div>
+      </div>
+      <div class="footer-links">
+        <a href="#policy">Политика</a>
+        <a href="#contacts">Контакты</a>
+        <a href="#support">Поддержка</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>

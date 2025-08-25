@@ -1,30 +1,30 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>KarmaSystem — Личный кабинет</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="dashboard-body">
   <div class="dashboard-layout">
     <aside class="sidebar">
-      <div class="sidebar-brand">
-        <div class="logo-img">KS</div>
+      <a class="sidebar-brand" href="/cabinet">
+        <div class="logo-img"><img src="/assets/logo.png" alt="KS" onerror="this.style.display='none'"></div>
         <span class="brand-text">KarmaSystem</span>
-      </div>
+      </a>
       <nav class="sidebar-nav">
-        <a class="nav-item active" data-page="overview">🟢 Обзор</a>
-        <a class="nav-item" data-page="cards">📇 Карточки</a>
-        <a class="nav-item" data-page="qr">🧾 QR/Купоны</a>
-        <a class="nav-item" data-page="districts">🧭 Районы</a>
-        <a class="nav-item" data-page="reviews">⭐ Отзывы</a>
-        <a class="nav-item" data-page="analytics">📈 Аналитика</a>
-        <a class="nav-item" data-page="integrations">🔌 Интеграции</a>
-        <a class="nav-item" data-page="team">👥 Команда</a>
-        <a class="nav-item" data-page="settings">⚙️ Настройки</a>
-        <a class="nav-item" data-page="support">🆘 Поддержка</a>
+        <a class="nav-item active" href="/cabinet">🟢 Обзор</a>
+        <a class="nav-item" href="/cabinet/cards">📇 Карточки</a>
+        <a class="nav-item" href="/cabinet/qr">🧾 QR/Купоны</a>
+        <a class="nav-item" href="/cabinet/districts">🧭 Районы</a>
+        <a class="nav-item" href="/cabinet/reviews">⭐ Отзывы</a>
+        <a class="nav-item" href="/cabinet/analytics">📈 Аналитика</a>
+        <a class="nav-item" href="/cabinet/integrations">🔌 Интеграции</a>
+        <a class="nav-item" href="/cabinet/team">👥 Команда</a>
+        <a class="nav-item" href="/cabinet/settings">⚙️ Настройки</a>
+        <a class="nav-item" href="/cabinet/support">🆘 Поддержка</a>
       </nav>
       <footer class="sidebar-footer">© KarmaSystem</footer>
     </aside>
@@ -32,66 +32,54 @@
     <main class="dashboard-main">
       <header class="topbar">
         <div class="topbar-title">Обзор</div>
-        <a href="/" class="btn-primary" style="margin-left:auto;margin-right:12px;">На главную</a>
+        <a href="/" class="btn btn-primary" style="margin-left:auto;">На главную</a>
         <div class="profile-chip">Д</div>
       </header>
 
-      <section class="page visible" id="page-overview">
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-label">Посетители</div><div class="stat-value" id="stat-visitors">12 630</div></div>
-          <div class="stat-card"><div class="stat-label">Сканов QR</div><div class="stat-value" id="stat-scans">3 450</div></div>
-          <div class="stat-card"><div class="stat-label">Конверсия</div><div class="stat-value" id="stat-cvr">27,3 %</div></div>
-          <div class="stat-card"><div class="stat-label">Средний чек</div><div class="stat-value" id="stat-avg">1 280 ₽</div></div>
-          <div class="stat-card"><div class="stat-label">Экономия гостям</div><div class="stat-value" id="stat-saved">482 500 ₽</div></div>
-          <div class="stat-card"><div class="stat-label">Выручка</div><div class="stat-value" id="stat-revenue">975 000 ₽</div></div>
-        </div>
-
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-title">Карточки</div>
-            <canvas id="barChart" width="600" height="300"></canvas>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title">Карта активности</div>
-            <div class="map-placeholder"></div>
-          </div>
-        </div>
-
-        <div class="section-header">
-          <div class="tabs">
-            <button class="tab active" data-tab="table-cards">Карточки</button>
-            <button class="tab" data-tab="table-coupons">QR/Купоны</button>
-            <button class="tab" data-tab="table-qrr">QRR</button>
-            <button class="tab" data-tab="table-analytics">АналДилиТика</button>
-          </div>
-          <a class="btn-primary" href="#" id="create-card">+ Создать карточку</a>
-        </div>
-
-        <div class="table-wrapper tab-pane visible" id="table-cards">
-          <table class="data-table">
-            <thead>
-              <tr><th>Название</th><th>Категория</th><th>Район</th><th>Статус</th><th></th></tr>
-            </thead>
-            <tbody id="cards-tbody"></tbody>
-          </table>
-        </div>
-
-        <div class="table-wrapper tab-pane" id="table-coupons"><div class="empty">Пока нет купонов. Нажмите «Создать».</div></div>
-        <div class="table-wrapper tab-pane" id="table-qrr"><div class="empty">Раздел в разработке.</div></div>
-        <div class="table-wrapper tab-pane" id="table-analytics"><div class="empty">Здесь появятся отчёты.</div></div>
+      <section class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Посетители</div><div class="stat-value">12 630</div></div>
+        <div class="stat-card"><div class="stat-label">Сканов QR</div><div class="stat-value">3 450</div></div>
+        <div class="stat-card"><div class="stat-label">Конверсия</div><div class="stat-value">27,3 %</div></div>
+        <div class="stat-card"><div class="stat-label">Средний чек</div><div class="stat-value">1 280 ₽</div></div>
+        <div class="stat-card"><div class="stat-label">Экономия гостям</div><div class="stat-value">482 500 ₽</div></div>
+        <div class="stat-card"><div class="stat-label">Выручка</div><div class="stat-value">975 000 ₽</div></div>
       </section>
 
-      <section class="page" id="page-cards"><div class="empty big">Здесь будет конструктор карточек.</div></section>
-      <section class="page" id="page-qr"><div class="empty big">Здесь будет управление QR/Купонами.</div></section>
-      <section class="page" id="page-districts"><div class="empty big">Здесь будут районы.</div></section>
-      <section class="page" id="page-reviews"><div class="empty big">Здесь будут отзывы.</div></section>
-      <section class="page" id="page-analytics"><div class="empty big">Здесь будет аналитика.</div></section>
-      <section class="page" id="page-integrations"><div class="empty big">Здесь будут интеграции.</div></section>
-      <section class="page" id="page-team"><div class="empty big">Здесь будет управление командой.</div></section>
-      <section class="page" id="page-settings"><div class="empty big">Здесь будут настройки.</div></section>
-      <section class="page" id="page-support"><div class="empty big">Здесь поддержка.</div></section>
+      <section class="charts-grid">
+        <div class="chart-card"><div class="chart-title">Карточки</div><canvas id="barChart" width="640" height="280"></canvas></div>
+        <div class="chart-card"><div class="chart-title">Карта активности</div><div class="map-placeholder"></div></div>
+      </section>
+
+      <section class="table-wrapper">
+        <div class="section-header">
+          <div class="tabs">
+            <a class="tab active" href="/cabinet/cards">Карточки</a>
+            <a class="tab" href="/cabinet/qr">QR/Купоны</a>
+            <a class="tab" href="/cabinet/analytics">Аналитика</a>
+          </div>
+          <a class="btn btn-primary" href="/cabinet/cards">+ Создать карточку</a>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Название</th><th>Категория</th><th>Район</th><th>Статус</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Кафе «Ваниль»</td><td>Кафе</td><td>Центральный</td><td><span class="status muted">Черновик</span></td><td class="row-actions">⋮</td></tr>
+            <tr><td>«МариВанна»</td><td>Ресторан</td><td>Северный</td><td><span class="status ok">Опубликовано</span></td><td class="row-actions">⋮</td></tr>
+            <tr><td>«Атлет»</td><td>Фитнес</td><td>Западный</td><td><span class="status ok">20 %</span></td><td class="row-actions">⋮</td></tr>
+          </tbody>
+        </table>
+      </section>
     </main>
   </div>
-  <script src="/cabinet.js"></script>
+  <script>
+  (function(){
+    const c=document.getElementById('barChart'); if(!c) return;
+    const ctx=c.getContext('2d'), W=c.width,H=c.height, p=32, data=[4,5,6,7,8,9], max=Math.max(...data)+1;
+    ctx.globalAlpha=.15; ctx.strokeStyle='#9CA3AF';
+    for(let i=0;i<=4;i++){const y=p+i*((H-p*2)/4); ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(W-p,y); ctx.stroke();}
+    ctx.globalAlpha=1; ctx.fillStyle='#111';
+    const bw=(W-p*2)/data.length*.6, g=(W-p*2)/data.length*.4;
+    data.forEach((v,i)=>{const h=(v/max)*(H-p*2), x=p+i*(bw+g)+g/2, y=H-p-h; ctx.fillRect(x,y,bw,h);});
+  })();
+  </script>
 </body>
 </html>

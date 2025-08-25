@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>KarmaSystem — Сервис лояльности</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <a class="brand" href="/"><img class="brand-logo" src="/assets/logo.png" onerror="this.style.display='none'" alt="KS"/><span class="brand-name">KarmaSystem</span></a>
+      <button class="nav-toggle" aria-label="Меню">☰</button>
+      <nav id="mainNav">
+        <ul>
+          <li><a href="#cards">Карточки</a></li>
+          <li><a href="#coupons">Купоны</a></li>
+          <li><a href="#reviews">Отзывы</a></li>
+          <li><a href="/cabinet">Личный кабинет</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>KarmaSystem — выгодно всем</h1>
+      <p>Скидки пользователям. Поток клиентов партнёрам.</p>
+      <div class="hero-buttons">
+        <a href="/cabinet" class="hero-button primary-btn">Личный кабинет</a>
+        <a href="#get-card" class="hero-button secondary-btn">Получить карту</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="cards-section" id="cards">
+    <div class="container">
+      <h2 class="section-title">Популярные заведения</h2>
+      <div class="cards-grid">
+        <div class="card"><div class="card-header"><h3 class="card-title">Кофейня «У Ашота»</h3><span class="discount-badge">-15%</span></div><p class="card-category">Кафе · Центральный</p><p>Кофе, выпечка, десерты. Уютная атмосфера для работы и встреч.</p></div>
+        <div class="card"><div class="card-header"><h3 class="card-title">Ресторан «МариВанна»</h3><span class="discount-badge">-10%</span></div><p class="card-category">Ресторан · Северный</p><p>Европейская и русская кухня. Банкеты и мероприятия.</p></div>
+        <div class="card"><div class="card-header"><h3 class="card-title">Фитнес-центр «Атлет»</h3><span class="discount-badge">-20%</span></div><p class="card-category">Спорт · Западный</p><p>Тренажёрный зал, группы, бассейн и спа.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reviews-section" id="reviews">
+    <div class="container">
+      <h2 class="section-title">Отзывы</h2>
+      <div class="reviews-slider">
+        <div class="review-card"><p class="review-text">«Посещаемость +25% за первый месяц!»</p><div class="review-author">Ольга, «МариВанна»</div></div>
+        <div class="review-card"><p class="review-text">«Экономлю ~3000 ₽ в месяц, удобно!»</p><div class="review-author">Михаил</div></div>
+        <div class="review-card"><p class="review-text">«Простая интеграция, понятный интерфейс»</p><div class="review-author">Антон, «Атлет»</div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="container footer-content"><div>© KarmaSystem</div><div class="footer-links"><a href="#">Политика</a><a href="#">Контакты</a><a href="#">Поддержка</a></div></div></footer>
+  <script>
+    document.querySelector('.nav-toggle')?.addEventListener('click',()=>document.querySelector('.site-header')?.classList.toggle('open'));
+  </script>
+</body>
+</html>

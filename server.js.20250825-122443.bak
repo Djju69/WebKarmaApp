@@ -1,0 +1,20 @@
+﻿const express = require("express");
+const path = require("path");
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// health-check
+app.get("/health", (req, res) => res.type("text").send("ok"));
+
+// статика (index.html будет найден по /)
+app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"] }));
+
+// явные страницы
+app.get("/",              (req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
+app.get("/cabinet",       (req,res)=>res.sendFile(path.join(__dirname,"public","cabinet.html")));
+app.get("/cabinet/cards", (req,res)=>res.sendFile(path.join(__dirname,"public","cabinet-cards.html")));
+
+// 404
+app.use((req,res)=>res.status(404).type("text").send("Not Found"));
+
+app.listen(PORT, ()=>console.log("Server is running on port", PORT));
