@@ -1,6 +1,10 @@
 const express = require("express");
 const path = require("path");
 const app = express();
+function sendUtf8(res, file) {
+  res.type('html; charset=utf-8');
+  res.sendFile(path.join(__dirname, 'public', file));
+}
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, "public"), {
@@ -25,4 +29,14 @@ app.get("/cabinet/settings",(req,res)=>res.sendFile(path.join(__dirname,"public"
 app.get("/cabinet/support",(req,res)=>res.sendFile(path.join(__dirname,"public","cabinet-support.html")));
 
 app.use((req,res)=>res.status(404).type("text").send("Not Found"));
-app.listen(PORT, ()=>console.log("Server is running on port", PORT));
+app.listen(PORT, ()=>console.log("Server is running on port", PORT));app.get('/cabinet/cards', (req, res) => {
+  res.sendFile(require('path').join(__dirname, 'public', 'cabinet-cards.html'));
+});
+app.get('/cabinet/qr', (req, res) => {
+  res.sendFile(require('path').join(__dirname, 'public', 'cabinet-qr.html'));
+});
+
+app.get('/cabinet/districts', (req, res) => {
+  const path = require('path');
+  sendUtf8(res, '');
+});
