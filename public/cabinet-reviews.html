@@ -1,25 +1,24 @@
-<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Отзывы — KarmaSystem</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/styles.css"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KarmaSystem — Личный кабинет / Отзывы</title>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="dashboard-body">
   <div class="dashboard-layout">
-    <aside class="sidebar">
-      <a class="sidebar-brand" href="/cabinet">
-        <div class="logo-img"><img src="/assets/logo.png" alt="KS" onerror="this.style.display='none'"/></div>
+        <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-img"><img src="/assets/logo.png" alt="KS" style="width:28px;height:28px;object-fit:contain"/></div>
         <span class="brand-text">KarmaSystem</span>
-      </a>
+      </div>
       <nav class="sidebar-nav">
         <a class="nav-item" href="/cabinet">🟢 Обзор</a>
         <a class="nav-item" href="/cabinet/cards">📇 Карточки</a>
         <a class="nav-item" href="/cabinet/qr">🧾 QR/Купоны</a>
         <a class="nav-item" href="/cabinet/districts">🧭 Районы</a>
-        <a class="nav-item active" href="/cabinet/reviews">⭐ Отзывы</a>
+        <a class="nav-item" href="/cabinet/reviews">⭐ Отзывы</a>
         <a class="nav-item" href="/cabinet/analytics">📈 Аналитика</a>
         <a class="nav-item" href="/cabinet/integrations">🔌 Интеграции</a>
         <a class="nav-item" href="/cabinet/team">👥 Команда</a>
@@ -28,18 +27,18 @@
       </nav>
       <footer class="sidebar-footer">© KarmaSystem</footer>
     </aside>
-
     <main class="dashboard-main">
       <header class="topbar">
+        <button class="nav-toggle">☰</button>
         <div class="topbar-title">Отзывы</div>
-        <a href="/" class="btn btn-primary" style="margin-left:auto;">На главную</a>
+        <a href="/" class="btn btn-primary" style="margin-left:auto">На главную</a>
         <div class="profile-chip">Д</div>
       </header>
-
-      <section class="panel">
-        <div class="k-note">Раздел «Отзывы» в разработке. Скажи, какой функционал делаем первым — подключу.</div>
+      <section class="page visible" id="page-reviews">
+        <div class="panel"><div class="k-title">Отзывы</div><div class="k-sub">Здесь появится управление отзывами.</div></div>
       </section>
     </main>
   </div>
+  <script src="/cabinet.js"></script>
 </body>
 </html>

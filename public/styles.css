@@ -152,3 +152,6 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,syste
   #mainNav .nav-list{flex-direction:column;align-items:stretch;gap:8px}
   #mainNav .nav-list a,.nav-cta{height:auto;padding:10px 12px;border-radius:10px}
 }
+/* VISIBILITY SAFE */
+.page{display:block}
+.panel{background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:14px;padding:16px}

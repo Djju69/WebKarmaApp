@@ -1,24 +1,23 @@
-<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Районы — KarmaSystem</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/styles.css"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KarmaSystem — Личный кабинет / Районы</title>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="dashboard-body">
   <div class="dashboard-layout">
-    <aside class="sidebar">
-      <a class="sidebar-brand" href="/cabinet">
-        <div class="logo-img"><img src="/assets/logo.png" alt="KS" onerror="this.style.display='none'"/></div>
+        <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-img"><img src="/assets/logo.png" alt="KS" style="width:28px;height:28px;object-fit:contain"/></div>
         <span class="brand-text">KarmaSystem</span>
-      </a>
+      </div>
       <nav class="sidebar-nav">
         <a class="nav-item" href="/cabinet">🟢 Обзор</a>
         <a class="nav-item" href="/cabinet/cards">📇 Карточки</a>
         <a class="nav-item" href="/cabinet/qr">🧾 QR/Купоны</a>
-        <a class="nav-item active" href="/cabinet/districts">🧭 Районы</a>
+        <a class="nav-item" href="/cabinet/districts">🧭 Районы</a>
         <a class="nav-item" href="/cabinet/reviews">⭐ Отзывы</a>
         <a class="nav-item" href="/cabinet/analytics">📈 Аналитика</a>
         <a class="nav-item" href="/cabinet/integrations">🔌 Интеграции</a>
@@ -28,18 +27,31 @@
       </nav>
       <footer class="sidebar-footer">© KarmaSystem</footer>
     </aside>
-
     <main class="dashboard-main">
       <header class="topbar">
+        <button class="nav-toggle">☰</button>
         <div class="topbar-title">Районы</div>
-        <a href="/" class="btn btn-primary" style="margin-left:auto;">На главную</a>
+        <a href="/" class="btn btn-primary" style="margin-left:auto">На главную</a>
         <div class="profile-chip">Д</div>
       </header>
-
-      <section class="panel">
-        <div class="k-note">Раздел «Районы» в разработке. Скажи, какой функционал делаем первым — подключу.</div>
+      <section class="page visible" id="page-districts">
+          <div class="panel">
+    <div class="k-head">
+      <div class="k-title">Фильтр</div>
+      <div class="k-actions">
+        <select id="sel-district" class="field">
+          <option value="">Все районы</option><option>Центр</option><option>Юг</option><option>Север</option><option>Запад</option>
+        </select>
+        <select id="sel-category" class="field">
+          <option value="">Все категории</option><option>Кафе</option><option>Ресторан</option><option>Фитнес</option>
+        </select>
+      </div>
+    </div>
+    <div id="filtered" class="list-simple"><div class="drow muted">Нет карточек под выбранный фильтр.</div></div>
+  </div>
       </section>
     </main>
   </div>
+  <script src="/cabinet.js"></script>
 </body>
 </html>

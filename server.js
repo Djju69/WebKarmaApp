@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,3 +26,8 @@ app.get("/cabinet/support",(req,res)=>res.sendFile(path.join(__dirname,"public",
 
 app.use((req,res)=>res.status(404).type("text").send("Not Found"));
 app.listen(PORT, ()=>console.log("Server is running on port", PORT));
+app.get('/cabinet', (req,res)=> res.sendFile(path.join(__dirname,'public','cabinet.html')));
+['cards','qr','districts','reviews','analytics','integrations','team','settings','support']
+  .forEach(slug=>{
+    app.get('/cabinet/'+slug, (req,res)=> res.sendFile(path.join(__dirname,'public','cabinet-'+slug+'.html')));
+  });

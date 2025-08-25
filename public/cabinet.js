@@ -1,134 +1,101 @@
-const rows = [
-  { name:'Кафе «Ваниль»',   category:'Кафе',     district:'Центральный', status:'Черновик'      },
-  { name:'Кафе «Триндово»', category:'Ресторан', district:'Северный',    status:'На модерации' },
-  { name:'«Атлет»',         category:'Фитнес',   district:'Западный',    status:'Опубликовано' },
-  { name:'«МариВанна»',     category:'Ресторан', district:'Северный',    status:'Опубликовано' },
-  { name:'«Какао»',         category:'Кафе',     district:'Сестрорецк',  status:'Опубликовано' },
-  { name:'«Гейя»',          category:'Ресторан', district:'Центральный', status:'Опубликовано' },
-];
-
-const qs = s => document.querySelector(s);
-const qsa = s => Array.from(document.querySelectorAll(s));
-
-function statusClass(s){
-  if (/опублик/i.test(s)) return 'ok';
-  if (/модера/i.test(s))  return 'warn';
-  if (/черновик/i.test(s))return 'muted';
-  return 'muted';
-}
-
-function applyFilters(data){
-  const term = (qs('#search')?.value || '').trim().toLowerCase();
-  const cat  = qs('#filter-category')?.value || '';
-  const dist = qs('#filter-district')?.value || '';
-  const st   = qs('#filter-status')?.value || '';
-  return data.filter(r =>
-    (!term || r.name.toLowerCase().includes(term)) &&
-    (!cat  || r.category === cat) &&
-    (!dist || r.district === dist) &&
-    (!st   || r.status === st)
-  );
-}
-
-function renderTable(){
-  const tbody = qs('#cards-tbody'); if (!tbody) return;
-  const list = applyFilters(rows);
-  tbody.innerHTML = list.map(r => 
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td><span class="chip "></span></td>
-      <td class="row-actions">⋮</td>
-    </tr>
-  ).join('');
-}
-
-function drawBarChart(){
-  const c = document.getElementById('barChart'); if (!c) return;
-  const ctx = c.getContext('2d'), W=c.width, H=c.height;
-  ctx.clearRect(0,0,W,H);
-  const data = [4,5,6,7,8,9], max = Math.max(...data)+1, p=32, bw=(W-p*2)/data.length*.6, g=(W-p*2)/data.length*.4;
-
-  // сетка
-  ctx.globalAlpha=.15; ctx.strokeStyle='#9CA3AF';
-  for(let i=0;i<=4;i++){const y=p+i*((H-p*2)/4); ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(W-p,y); ctx.stroke();}
-  ctx.globalAlpha=1;
-
-  // ч/б столбики
-  const css = getComputedStyle(document.documentElement);
-  const barColor = (css.getPropertyValue('--chart-bar') || css.getPropertyValue('--accent-primary') || '#111').trim();
-  ctx.fillStyle = barColor;
-
-  data.forEach((v,i)=>{
-    const h=(v/max)*(H-p*2), x=p+i*(bw+g)+g/2, y=H-p-h;
-    ctx.fillRect(x,y,bw,h);
+﻿document.addEventListener("DOMContentLoaded", ()=>{
+  const layout = document.querySelector(".dashboard-layout");
+  const toggle = document.querySelector(".nav-toggle");
+  toggle?.addEventListener("click", ()=> layout?.classList.toggle("menu-open"));
+  document.querySelectorAll(".sidebar-nav .nav-item").forEach(a=>{
+    a.addEventListener("click", ()=> layout?.classList.remove("menu-open"));
   });
-}
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape") layout?.classList.remove("menu-open"); });
 
-// Делегация кликов (работает даже если верстку поменять)
-function handleClick(e){
-  const target = e.target.closest('.sidebar .nav-item, .tab, #create-card');
-  if (!target) return;
+  // DEMO (если нет данных)
+  const demoCards = [
+    {name:"Кофейня «У Ашота»", cat:"Кафе",    dist:"Центр", st:"-15%"},
+    {name:"Ресторан «МариВанна»", cat:"Ресторан", dist:"Север", st:"-10%"},
+    {name:"Фитнес-центр «Атлет»", cat:"Фитнес", dist:"Запад", st:"-20%"}
+  ];
+  function load(key, fallback){ try{ const v = JSON.parse(localStorage.getItem(key)||"null"); return Array.isArray(v)?v:fallback }catch{ return fallback } }
+  function save(key, data){ localStorage.setItem(key, JSON.stringify(data)); }
 
-  // переход по разделам сайдбара
-  if (target.matches('.sidebar .nav-item')){
-    e.preventDefault();
-    const items = qsa('.sidebar .nav-item'), pages = qsa('.page'), title = qs('.topbar-title');
-    items.forEach(i=>i.classList.remove('active'));
-    target.classList.add('active');
-    const pid = 'page-' + target.dataset.page;
-    pages.forEach(p=>p.classList.remove('visible'));
-    const el = document.getElementById(pid);
-    if (el) el.classList.add('visible');
-    if (title) title.textContent = target.textContent.replace(/^[^\\s]+\\s/, '');
-    return;
+  // Обзор
+  if (document.getElementById("page-overview")){
+    const rows = load("ks_cards", demoCards);
+    const tb   = document.getElementById("cards-tbody");
+    if (tb){
+      tb.innerHTML = rows.map(r=>`<tr><td>${r.name}</td><td>${r.cat}</td><td>${r.dist}</td><td><span class="status ok">${r.st||""}</span></td></tr>`).join("")
+        || '<tr><td colspan="4" class="muted" style="padding:16px">Нет данных</td></tr>';
+    }
+    const S=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=String(val) };
+    S("stat-visitors",12630); S("stat-scans",3450); S("stat-cvr","27,3 %"); S("stat-avg","1 280 ₽");
   }
 
-  // табы в «Карточки / QR / QRR / Аналитика»
-  if (target.matches('.tab')){
-    e.preventDefault();
-    const tabs = qsa('.tab'), panes = qsa('.tab-pane');
-    tabs.forEach(t=>t.classList.remove('active'));
-    target.classList.add('active');
-    panes.forEach(p=>p.classList.remove('visible'));
-    const pane = document.getElementById(target.dataset.tab);
-    if (pane) pane.classList.add('visible');
-    return;
+  // Карточки
+  if (document.getElementById("page-cards")){
+    const key="ks_cards"; let rows = load(key, demoCards.slice());
+    const tbody = document.getElementById("cards-tbody");
+    function render(){
+      tbody.innerHTML = rows.map((r,i)=>`
+        <tr>
+          <td>${r.name}</td><td>${r.cat}</td><td>${r.dist}</td>
+          <td><span class="status ${r.st?'ok':'muted'}">${r.st||'—'}</span></td>
+          <td style="text-align:right">
+            <button class="btn xs outline" data-ed="${i}">Редакт.</button>
+            <button class="btn xs" data-del="${i}">Удалить</button>
+          </td>
+        </tr>`).join("") || '<tr><td colspan="5" class="muted" style="padding:16px">Пусто</td></tr>';
+    }
+    function promptCard(base){
+      const name = prompt("Название", base?.name||""); if(!name) return null;
+      const cat  = prompt("Категория (Кафе/Ресторан/Фитнес)", base?.cat||"");
+      const dist = prompt("Район (Центр/Юг/Север/Запад)", base?.dist||"");
+      const st   = prompt("Статус/скидка (например -15%)", base?.st||"");
+      return {name, cat, dist, st};
+    }
+    document.getElementById("card-add")?.addEventListener("click", ()=>{
+      const c = promptCard(null); if(!c) return; rows.push(c); save(key, rows); render();
+    });
+    tbody?.addEventListener("click",(e)=>{
+      const t=e.target; if(!(t instanceof HTMLElement)) return;
+      if(t.hasAttribute("data-del")){ const i=+t.getAttribute("data-del"); rows.splice(i,1); save(key,rows); render(); }
+      else if(t.hasAttribute("data-ed")){ const i=+t.getAttribute("data-ed"); const c=promptCard(rows[i]); if(!c) return; rows[i]=c; save(key,rows); render(); }
+    });
+    render();
   }
 
-  // «Создать карточку»
-  if (target.matches('#create-card')){
-    e.preventDefault();
-    alert('Здесь откроется конструктор карточки (заглушка).');
-    return;
+  // Купоны
+  if (document.getElementById("page-qr")){
+    const key="ks_coupons"; let rows = load(key, []);
+    const tbody=document.getElementById("coupon-tbody");
+    function render(){
+      tbody.innerHTML = rows.map((r,i)=>`
+        <tr><td>${r.code}</td><td>${r.off||0}%</td><td>${r.exp||'—'}</td><td>${r.limit||'—'}</td>
+        <td style="text-align:right"><button class="btn xs" data-del="${i}">Удалить</button></td></tr>
+      `).join("") || '<tr><td colspan="5" class="muted" style="padding:16px">Нет купонов</td></tr>';
+    }
+    document.getElementById("coupon-add")?.addEventListener("click", ()=>{
+      const code=prompt("Код купона"); if(!code) return;
+      const off=+prompt("Скидка %","10")||0; const exp=prompt("Действует до (YYYY-MM-DD)",""); const limit=+prompt("Лимит, шт","100")||0;
+      rows.push({code,off,exp,limit}); save(key,rows); render();
+    });
+    tbody?.addEventListener("click",(e)=>{ const t=e.target; if(!(t instanceof HTMLElement)) return;
+      if(t.hasAttribute("data-del")){ const i=+t.getAttribute("data-del"); rows.splice(i,1); save(key,rows); render(); }
+    });
+    render();
   }
-}
 
-// Поддержка клавиатуры: Enter/Space = клик
-function handleKeydown(e){
-  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.nav-item, .tab, #create-card')){
-    e.preventDefault();
-    e.target.click();
+  // Районы (фильтр читает карточки)
+  if (document.getElementById("page-districts")){
+    const list=document.getElementById("filtered");
+    const selD=document.getElementById("sel-district");
+    const selC=document.getElementById("sel-category");
+    const rows = load("ks_cards", []);
+    function render(){
+      const d=selD.value.trim(), c=selC.value.trim();
+      const f=rows.filter(r => (!d||r.dist===d) && (!c||r.cat===c));
+      list.innerHTML = f.map(r=>`<div class="drow"><b>${r.name}</b> — ${r.cat}, ${r.dist} <span class="muted">${r.st||''}</span></div>`).join("")
+        || '<div class="drow muted">Нет карточек под выбранный фильтр.</div>';
+    }
+    selD?.addEventListener("change", render);
+    selC?.addEventListener("change", render);
+    render();
   }
-}
-
-function setupFilters(){
-  ['#search','#filter-category','#filter-district','#filter-status'].forEach(sel=>{
-    const el = qs(sel);
-    if (!el) return;
-    const ev = el.tagName === 'SELECT' ? 'change' : 'input';
-    el.addEventListener(ev, renderTable);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', ()=>{
-  // делегирование событий
-  document.addEventListener('click', handleClick);
-  document.addEventListener('keydown', handleKeydown);
-
-  // первичный рендер
-  setupFilters();
-  renderTable();
-  drawBarChart();
 });
