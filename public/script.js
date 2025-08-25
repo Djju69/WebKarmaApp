@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+﻿document.addEventListener("DOMContentLoaded", () => {
   // Mobile menu
   const toggle = document.querySelector(".nav-toggle");
   const header = document.querySelector(".site-header");

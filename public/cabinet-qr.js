@@ -1,4 +1,4 @@
-(function(){
+﻿(function(){
   'use strict';
 
   const STORAGE_KEY = 'ks_coupons_v1';
