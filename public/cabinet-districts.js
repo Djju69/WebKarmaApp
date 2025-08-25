@@ -1,0 +1,76 @@
+﻿?(function(){
+  const data = [
+    { id:1, name:'??????? �? ?????�',   category:'????',     district:'?????',  address:'??????? ??., 10',  discount:'-15%' },
+    { id:2, name:'???????? �?????????�', category:'????????', district:'?????', address:'??????, 8',       discount:'-10%' },
+    { id:3, name:'?????? �?????�',      category:'??????',   district:'??',    address:'??????????, 3',   discount:'-20%' },
+    { id:4, name:'???? �?????�',        category:'????',     district:'??',    address:'??????, 5',       discount:'-5%'  },
+    { id:5, name:'???? �??????�',       category:'????',     district:'?????', address:'???????, 12',     discount:'-12%' },
+    { id:6, name:'???????? �????????�', category:'????????', district:'?????', address:'????????, 4',     discount:'-18%' }
+  ];
+
+  const qs = (s,sc=document)=>sc.querySelector(s);
+  const qsa = (s,sc=document)=>Array.from(sc.querySelectorAll(s));
+
+  const districtSel = qs('#districtSelect');
+  const categorySel = qs('#categorySelect');
+  const districtCount = qs('#districtCount');
+  const categoryCount = qs('#categoryCount');
+  const cardsEl = qs('#cards');
+  const statsEl = qs('#stats');
+
+  const LS_KEY = 'ks_filter_v1';
+  const saved = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+  if(saved.district) districtSel.value = saved.district;
+  if(saved.category) categorySel.value = saved.category;
+
+  function apply(){
+    const d = districtSel.value;
+    const c = categorySel.value;
+    const filtered = data.filter(x=>
+      (d==='all'||x.district===d) &&
+      (c==='all'||x.category===c)
+    );
+
+    // ?????? ????????
+    cardsEl.innerHTML = filtered.map(x=>
+      <div class="dcard">
+        <div class="dcard-h">
+          <div class="dcard-title"></div>
+          <span class="d-badge"></span>
+        </div>
+        <div class="dcard-sub"> � </div>
+        <div class="dcard-addr"></div>
+        <div class="dcard-actions">
+          <a class="btn xs" href="/cabinet/cards">???????</a>
+          <a class="btn xs outline" href="/cabinet/qr">??????</a>
+        </div>
+      </div>
+    ).join('');
+
+    // ??????? ????? ? ???????? (??????? ????????)
+    districtCount.textContent = filtered.length;
+    categoryCount.textContent = filtered.length;
+
+    // ??????? ?????????? ?? ???????
+    const total = data.length;
+    const cnt = {
+      '?????': data.filter(x=>x.district==='?????').length,
+      '??':    data.filter(x=>x.district==='??').length,
+      '?????': data.filter(x=>x.district==='?????').length
+    };
+    statsEl.innerHTML = 
+      <div class="dstat"><div class="dstat-v"></div><div class="dstat-l">?????</div></div>
+      <div class="dstat"><div class="dstat-v"></div><div class="dstat-l">?????</div></div>
+      <div class="dstat"><div class="dstat-v"></div><div class="dstat-l">??</div></div>
+      <div class="dstat"><div class="dstat-v"></div><div class="dstat-l">?????</div></div>
+    ;
+
+    // ????????? ?????
+    localStorage.setItem(LS_KEY, JSON.stringify({district:d, category:c}));
+  }
+
+  districtSel.addEventListener('change', apply);
+  categorySel.addEventListener('change', apply);
+  document.addEventListener('DOMContentLoaded', apply);
+  apply();
+})();

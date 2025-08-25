@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KarmaSystem Р Р†Р вЂљРІР‚Сњ Р В РІР‚С”Р В РЎвЂР РЋРІР‚РЋР В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р В РЎвЂќР В Р’В°Р В Р’В±Р В РЎвЂР В Р вЂ¦Р В Р’ВµР РЋРІР‚С™</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="dashboard-body">
+  <div class="dashboard-layout">
+    <aside class="sidebar">
+      <a class="sidebar-brand" href="/cabinet">
+        <div class="logo-img"><img src="/assets/logo.png" alt="KS" onerror="this.style.display='none'"></div>
+        <span class="brand-text">KarmaSystem</span>
+      </a>
+      <nav class="sidebar-nav">
+        <a class="nav-item active" href="/cabinet">РЎР‚РЎСџРЎСџРЎС› Р В РЎвЂєР В Р’В±Р В Р’В·Р В РЎвЂўР РЋР вЂљ</a>
+        <a class="nav-item" href="/cabinet/cards">РЎР‚РЎСџРІР‚СљРІР‚РЋ Р В РЎв„ўР В Р’В°Р РЋР вЂљР РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В РЎвЂќР В РЎвЂ</a>
+        <a class="nav-item" href="/cabinet/qr">РЎР‚РЎСџР’В§РЎвЂў QR/Р В РЎв„ўР РЋРЎвЂњР В РЎвЂ”Р В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„–</a>
+        <a class="nav-item" href="/cabinet/districts">РЎР‚РЎСџР’В§Р’В­ Р В Р’В Р В Р’В°Р В РІвЂћвЂ“Р В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„–</a>
+        <a class="nav-item" href="/cabinet/reviews">Р Р†Р’В­РЎвЂ™ Р В РЎвЂєР РЋРІР‚С™Р В Р’В·Р РЋРІР‚в„–Р В Р вЂ Р РЋРІР‚в„–</a>
+        <a class="nav-item" href="/cabinet/analytics">РЎР‚РЎСџРІР‚СљРІвЂљВ¬ Р В РЎвЂ™Р В Р вЂ¦Р В Р’В°Р В Р’В»Р В РЎвЂР РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В°</a>
+        <a class="nav-item" href="/cabinet/integrations">РЎР‚РЎСџРІР‚СњР Р‰ Р В Р’ВР В Р вЂ¦Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР В РЎвЂ</a>
+        <a class="nav-item" href="/cabinet/team">РЎР‚РЎСџРІР‚ВРўС’ Р В РЎв„ўР В РЎвЂўР В РЎВР В Р’В°Р В Р вЂ¦Р В РўвЂР В Р’В°</a>
+        <a class="nav-item" href="/cabinet/settings">Р Р†РЎв„ўРІвЂћСћР С—РЎвЂР РЏ Р В РЎСљР В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В РІвЂћвЂ“Р В РЎвЂќР В РЎвЂ</a>
+        <a class="nav-item" href="/cabinet/support">РЎР‚РЎСџРІР‚В Р’В Р В РЎСџР В РЎвЂўР В РўвЂР В РўвЂР В Р’ВµР РЋР вЂљР В Р’В¶Р В РЎвЂќР В Р’В°</a>
+      </nav>
+      <footer class="sidebar-footer">Р вЂ™Р’В© KarmaSystem</footer>
+    </aside>
+
+    <main class="dashboard-main">
+      <header class="topbar">
+        <div class="topbar-title">Р В РЎвЂєР В Р’В±Р В Р’В·Р В РЎвЂўР РЋР вЂљ</div>
+        <a href="/" class="btn btn-primary" style="margin-left:auto;">Р В РЎСљР В Р’В° Р В РЎвЂ“Р В Р’В»Р В Р’В°Р В Р вЂ Р В Р вЂ¦Р РЋРЎвЂњР РЋР вЂ№</a>
+        <div class="profile-chip">Р В РІР‚Сњ</div>
+      </header>
+
+      <section class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Р В РЎСџР В РЎвЂўР РЋР С“Р В Р’ВµР РЋРІР‚С™Р В РЎвЂР РЋРІР‚С™Р В Р’ВµР В Р’В»Р В РЎвЂ</div><div class="stat-value">12 630</div></div>
+        <div class="stat-card"><div class="stat-label">Р В Р Р‹Р В РЎвЂќР В Р’В°Р В Р вЂ¦Р В РЎвЂўР В Р вЂ  QR</div><div class="stat-value">3 450</div></div>
+        <div class="stat-card"><div class="stat-label">Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р В Р вЂ Р В Р’ВµР РЋР вЂљР РЋР С“Р В РЎвЂР РЋР РЏ</div><div class="stat-value">27,3 %</div></div>
+        <div class="stat-card"><div class="stat-label">Р В Р Р‹Р РЋР вЂљР В Р’ВµР В РўвЂР В Р вЂ¦Р В РЎвЂР В РІвЂћвЂ“ Р РЋРІР‚РЋР В Р’ВµР В РЎвЂќ</div><div class="stat-value">1 280 Р Р†РІР‚С™Р вЂ¦</div></div>
+        <div class="stat-card"><div class="stat-label">Р В Р’В­Р В РЎвЂќР В РЎвЂўР В Р вЂ¦Р В РЎвЂўР В РЎВР В РЎвЂР РЋР РЏ Р В РЎвЂ“Р В РЎвЂўР РЋР С“Р РЋРІР‚С™Р РЋР РЏР В РЎВ</div><div class="stat-value">482 500 Р Р†РІР‚С™Р вЂ¦</div></div>
+        <div class="stat-card"><div class="stat-label">Р В РІР‚в„ўР РЋРІР‚в„–Р РЋР вЂљР РЋРЎвЂњР РЋРІР‚РЋР В РЎвЂќР В Р’В°</div><div class="stat-value">975 000 Р Р†РІР‚С™Р вЂ¦</div></div>
+      </section>
+
+      <section class="charts-grid">
+        <div class="chart-card"><div class="chart-title">Р В РЎв„ўР В Р’В°Р РЋР вЂљР РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В РЎвЂќР В РЎвЂ</div><canvas id="barChart" width="640" height="280"></canvas></div>
+        <div class="chart-card"><div class="chart-title">Р В РЎв„ўР В Р’В°Р РЋР вЂљР РЋРІР‚С™Р В Р’В° Р В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂР В Р вЂ Р В Р вЂ¦Р В РЎвЂўР РЋР С“Р РЋРІР‚С™Р В РЎвЂ</div><div class="map-placeholder"></div></div>
+      </section>
+
+      <section class="table-wrapper">
+        <div class="section-header">
+          <div class="tabs">
+            <a class="tab active" href="/cabinet/cards">Р В РЎв„ўР В Р’В°Р РЋР вЂљР РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В РЎвЂќР В РЎвЂ</a>
+            <a class="tab" href="/cabinet/qr">QR/Р В РЎв„ўР РЋРЎвЂњР В РЎвЂ”Р В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„–</a>
+            <a class="tab" href="/cabinet/analytics">Р В РЎвЂ™Р В Р вЂ¦Р В Р’В°Р В Р’В»Р В РЎвЂР РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В°</a>
+          </div>
+          <a class="btn btn-primary" href="/cabinet/cards">+ Р В Р Р‹Р В РЎвЂўР В Р’В·Р В РўвЂР В Р’В°Р РЋРІР‚С™Р РЋР Р‰ Р В РЎвЂќР В Р’В°Р РЋР вЂљР РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В РЎвЂќР РЋРЎвЂњ</a>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Р В РЎСљР В Р’В°Р В Р’В·Р В Р вЂ Р В Р’В°Р В Р вЂ¦Р В РЎвЂР В Р’Вµ</th><th>Р В РЎв„ўР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР РЋР РЏ</th><th>Р В Р’В Р В Р’В°Р В РІвЂћвЂ“Р В РЎвЂўР В Р вЂ¦</th><th>Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Р В РЎв„ўР В Р’В°Р РЋРІР‚С›Р В Р’Вµ Р вЂ™Р’В«Р В РІР‚в„ўР В Р’В°Р В Р вЂ¦Р В РЎвЂР В Р’В»Р РЋР Р‰Р вЂ™Р’В»</td><td>Р В РЎв„ўР В Р’В°Р РЋРІР‚С›Р В Р’Вµ</td><td>Р В Р’В¦Р В Р’ВµР В Р вЂ¦Р РЋРІР‚С™Р РЋР вЂљР В Р’В°Р В Р’В»Р РЋР Р‰Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“</td><td><span class="status muted">Р В Р’В§Р В Р’ВµР РЋР вЂљР В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В РЎвЂР В РЎвЂќ</span></td><td class="row-actions">Р Р†РІР‚в„–Р’В®</td></tr>
+            <tr><td>Р вЂ™Р’В«Р В РЎС™Р В Р’В°Р РЋР вЂљР В РЎвЂР В РІР‚в„ўР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р В Р’В°Р вЂ™Р’В»</td><td>Р В Р’В Р В Р’ВµР РЋР С“Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В Р’В°Р В Р вЂ¦</td><td>Р В Р Р‹Р В Р’ВµР В Р вЂ Р В Р’ВµР РЋР вЂљР В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“</td><td><span class="status ok">Р В РЎвЂєР В РЎвЂ”Р РЋРЎвЂњР В Р’В±Р В Р’В»Р В РЎвЂР В РЎвЂќР В РЎвЂўР В Р вЂ Р В Р’В°Р В Р вЂ¦Р В РЎвЂў</span></td><td class="row-actions">Р Р†РІР‚в„–Р’В®</td></tr>
+            <tr><td>Р вЂ™Р’В«Р В РЎвЂ™Р РЋРІР‚С™Р В Р’В»Р В Р’ВµР РЋРІР‚С™Р вЂ™Р’В»</td><td>Р В Р’В¤Р В РЎвЂР РЋРІР‚С™Р В Р вЂ¦Р В Р’ВµР РЋР С“</td><td>Р В РІР‚вЂќР В Р’В°Р В РЎвЂ”Р В Р’В°Р В РўвЂР В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“</td><td><span class="status ok">20 %</span></td><td class="row-actions">Р Р†РІР‚в„–Р’В®</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+  <script>
+  (function(){
+    const c=document.getElementById('barChart'); if(!c) return;
+    const ctx=c.getContext('2d'), W=c.width,H=c.height, p=32, data=[4,5,6,7,8,9], max=Math.max(...data)+1;
+    ctx.globalAlpha=.15; ctx.strokeStyle='#9CA3AF';
+    for(let i=0;i<=4;i++){const y=p+i*((H-p*2)/4); ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(W-p,y); ctx.stroke();}
+    ctx.globalAlpha=1; ctx.fillStyle='#111';
+    const bw=(W-p*2)/data.length*.6, g=(W-p*2)/data.length*.4;
+    data.forEach((v,i)=>{const h=(v/max)*(H-p*2), x=p+i*(bw+g)+g/2, y=H-p-h; ctx.fillRect(x,y,bw,h);});
+  })();
+  </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-﻿?:root{
+﻿:root{
   --bg:#fff; --ink:#111; --ink-2:#6B7280; --line:#E5E7EB; --muted:#F5F7FA;
   --radius:14px; --shadow:0 8px 30px rgba(17,17,17,.06);
 }
@@ -38,7 +38,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,syste
 .hero-card-title{font-size:22px;font-weight:800}
 @media (max-width:980px){.hero-grid{grid-template-columns:1fr} .hero-copy h1{font-size:36px}}
 
-/* TOP ?�?'?�?.???? ???,??? ?�?"?�?�???,???"?????�?�?�?�???? */
+/* TOP Р Т‘Р Р…РЎРЏ РІР‚вЂќ Р С”Р В°РЎР‚РЎС“РЎРѓР ВµР В»РЎРЉ */
 .topday{padding:8px 0 16px}
 .topday-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .topday h2{font-size:22px;margin:0}

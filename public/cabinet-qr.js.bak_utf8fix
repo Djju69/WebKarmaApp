@@ -1,4 +1,4 @@
-﻿?(function(){
+﻿(function(){
   'use strict';
 
   const STORAGE_KEY = 'ks_coupons_v1';
@@ -62,22 +62,22 @@
   }
 
   function statusOf(c){
-    if (!c.published) return '?�?>??????�?"?�?�???<??????�?�?�?.?�?.';
+    if (!c.published) return 'Р С›РЎвЂљР С”Р В»РЎР‹РЎвЂЎР ВµР Р…Р С•';
     const now = new Date();
     const s = parseDate(c.start), e = parseDate(c.end);
-    if (s && now < s) return '?�??"?�?�?�?-?�?�?�?�?�?.?�?'???,?�?.?�???�?�?�?.?�?.';
-    if (e && now > new Date(e.getTime()+24*3600*1000-1)) return '?�?�?????????????�?�?"';
-    if (c.maxUses && Number(c.used||0) >= Number(c.maxUses)) return '?�????�?'?�?�?�?'????? ?�?'??????????�?�???,?�?-?�?�?�?.';
-    return '?�?'?�?"??????�?'?�???�?�?�?.';
+    if (s && now < s) return 'Р вЂ”Р В°Р С—Р В»Р В°Р Р…Р С‘РЎР‚Р С•Р Р†Р В°Р Р…Р С•';
+    if (e && now > new Date(e.getTime()+24*3600*1000-1)) return 'Р ВРЎРѓРЎвЂљРЎвЂР С”';
+    if (c.maxUses && Number(c.used||0) >= Number(c.maxUses)) return 'Р вЂєР С‘Р СР С‘РЎвЂљ Р С‘РЎРѓРЎвЂЎР ВµРЎР‚Р С—Р В°Р Р…';
+    return 'Р С’Р С”РЎвЂљР С‘Р Р†Р ВµР Р…';
   }
 
   function statusClass(s){
     const x = (s||'').toLowerCase();
-    if (x.includes('?�?�?�?"??????�?'?�??')) return 'ok';
-    if (x.includes('?�?-?�?�?�?�?�?.'))  return 'warn';
-    if (x.includes('?�?'??????????�?�???,')) return 'warn';
-    if (x.includes('?�?'?????????????�') || x.includes('?�?'??????????�?�?�?"')) return 'muted';
-    if (x.includes('?�?.??????�?"?�?�???<?????')) return 'muted';
+    if (x.includes('Р В°Р С”РЎвЂљР С‘Р Р†')) return 'ok';
+    if (x.includes('Р С—Р В»Р В°Р Р…'))  return 'warn';
+    if (x.includes('Р С‘РЎРѓРЎвЂЎР ВµРЎР‚')) return 'warn';
+    if (x.includes('Р С‘РЎРѓРЎвЂљРЎвЂ') || x.includes('Р С‘РЎРѓРЎвЂљР ВµР С”')) return 'muted';
+    if (x.includes('Р С•РЎвЂљР С”Р В»РЎР‹РЎвЂЎ')) return 'muted';
     return 'muted';
   }
 
@@ -93,9 +93,9 @@
   function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(coupons)); }
   function demo(){
     return [
-      { id:uid(), title:'-15% ?�?.?�?� ?�?"?�?.??????�?�', code:'COFFEE15', discountType:'percent', value:15, start:todayStr(), end:'', maxUses:0, used:0, minPurchase:0, published:true, description:'' },
-      { id:uid(), title:'200 ??????. ?�?.?�?� ?�?.?�?�?�?�?�?'', code:'LUNCH200', discountType:'amount', value:200, start:todayStr(), end:'', maxUses:100, used:3, minPurchase:800, published:true, description:'' },
-      { id:uid(), title:'-10% ??????�?'??????�?.?�?�????', code:'FIT10', discountType:'percent', value:10, start:'', end:'', maxUses:0, used:0, minPurchase:0, published:false, description:'' },
+      { id:uid(), title:'-15% Р Р…Р В° Р С”Р С•РЎвЂћР Вµ', code:'COFFEE15', discountType:'percent', value:15, start:todayStr(), end:'', maxUses:0, used:0, minPurchase:0, published:true, description:'' },
+      { id:uid(), title:'200 РІвЂљР… Р Р…Р В° Р С•Р В±Р ВµР Т‘', code:'LUNCH200', discountType:'amount', value:200, start:todayStr(), end:'', maxUses:100, used:3, minPurchase:800, published:true, description:'' },
+      { id:uid(), title:'-10% РЎвЂћР С‘РЎвЂљР Р…Р ВµРЎРѓ', code:'FIT10', discountType:'percent', value:10, start:'', end:'', maxUses:0, used:0, minPurchase:0, published:false, description:'' },
     ];
   }
 
@@ -141,13 +141,13 @@
         <td><code></code></td>
         <td></td>
         <td></td>
-        <td> ???,??? </td>
+        <td> РІР‚вЂќ </td>
         <td></td>
         <td><span class="status "></span></td>
         <td class="row-actions">
           <button class="btn btn-xs" data-qr="">QR</button>
-          <button class="btn btn-xs" data-edit="">?�?�?�?�?�?�.</button>
-          <button class="btn btn-xs btn-danger" data-del="">?�???�?'?�?�?�?�.</button>
+          <button class="btn btn-xs" data-edit="">Р ВР В·Р С.</button>
+          <button class="btn btn-xs btn-danger" data-del="">Р Р€Р Т‘Р В°Р В».</button>
         </td>
       ;
       tbody.appendChild(tr);
@@ -180,13 +180,13 @@
   function fromForm(){
     const title = f.title.value.trim();
     const code  = f.code.value.trim().toUpperCase();
-    if (!title){ alert('?�??T?�???�?�?�?'?�?'??????�?� ?�?.?�?�?�?�?�???�?�?�?.?�?'?�?�'); f.title.focus(); return null; }
-    if (!code){ alert('?�??T?�???�?�?�?'?�?'??????�?� ?�?"?�?.?�?''); f.code.focus(); return null; }
+    if (!title){ alert('Р вЂ™Р Р†Р ВµР Т‘Р С‘РЎвЂљР Вµ Р Р…Р В°Р В·Р Р†Р В°Р Р…Р С‘Р Вµ'); f.title.focus(); return null; }
+    if (!code){ alert('Р вЂ™Р Р†Р ВµР Т‘Р С‘РЎвЂљР Вµ Р С”Р С•Р Т‘'); f.code.focus(); return null; }
     const value = f.value.value===''?null:Number(f.value.value);
-    if (value===null || isNaN(value) || value<=0){ alert('?�???�?�?�???�?�???,?�?.?�?.?�?� ?�?�?�?.?�?�??????�?�?�?.?�?'?�?� ?????�?"?�?'?�?'?�?"?�?''); f.value.focus(); return null; }
+    if (value===null || isNaN(value) || value<=0){ alert('Р СњР ВµР Р†Р ВµРЎР‚Р Р…Р С•Р Вµ Р В·Р Р…Р В°РЎвЂЎР ВµР Р…Р С‘Р Вµ РЎРѓР С”Р С‘Р Т‘Р С”Р С‘'); f.value.focus(); return null; }
     const start = f.start.value.trim();
     const end   = f.end.value.trim();
-    if (start && end && new Date(start) > new Date(end)){ alert('?�????�?�??????�?� ?�?.?�?�??????�?�?�?�?�?� ?�?-?�?.?�?�?�?�?�?� ?�?'?�?�?????????? ?�?.?�?"?�?.?�?.??????�?�?�?.?�?'????'); return null; }
+    if (start && end && new Date(start) > new Date(end)){ alert('Р вЂќР В°РЎвЂљР В° Р Р…Р В°РЎвЂЎР В°Р В»Р В° Р С—Р С•Р В·Р В¶Р Вµ Р Т‘Р В°РЎвЂљРЎвЂ№ Р С•Р С”Р С•Р Р…РЎвЂЎР В°Р Р…Р С‘РЎРЏ'); return null; }
     const obj = {
       id: f.id.value || uid(),
       title, code,
@@ -236,7 +236,7 @@
     if (t.matches('[data-del]')){
       const id = t.getAttribute('data-del');
       const c = coupons.find(x=>x.id===id);
-      if (c && confirm(?�???�?'?�?�?�?�?�?'????????? ?�?"???"?�?-?�?.?�?. ?'?�?'?�?)){
+      if (c && confirm(Р Р€Р Т‘Р В°Р В»Р С‘РЎвЂљРЎРЉ Р С”РЎС“Р С—Р С•Р Р… Р’В«Р’В»?)){
         coupons = coupons.filter(x=>x.id!==id);
         save(); render();
       }
@@ -250,13 +250,13 @@
 
   // ====== QR ======
   function redeemUrl(code){
-    // ?�????�?�?�?�?�?.?�?.????????????,?�?�????�?�?'?�?.?�?.?�?.?�?�???? ??????????????�?�?�?"?�?� ?�?.?�?� ???,?�?�?�?'?�?�?�?�?�?-???,�?�?. (?�?-?�?.?�?"?�?� ?�?�?�?�?�?� ?????�?�???,?�???�?�???,?�?�)
+    // Р вЂќР ВµР СР С•Р Р…РЎРѓРЎвЂљРЎР‚Р В°РЎвЂ Р С‘Р С•Р Р…Р Р…Р В°РЎРЏ РЎРѓРЎРѓРЎвЂ№Р В»Р С”Р В° Р Р…Р В° РЎР‚Р ВµР Т‘Р ВµР СР С—РЎв‚¬Р Р… (Р С—Р С•Р С”Р В° Р В±Р ВµР В· РЎРѓР ВµРЎР‚Р Р†Р ВµРЎР‚Р В°)
     return window.location.origin + '/coupon?code=' + encodeURIComponent(code);
   }
 
   let qrInstance = null;
   function showQr(c){
-    qrTitle.textContent = c.title || '?�?T???"?�?-?�?.?�?.';
+    qrTitle.textContent = c.title || 'Р С™РЎС“Р С—Р С•Р Р…';
     qrCodeText.textContent = c.code || '';
     qrBox.innerHTML = '';
     qrInstance = new QRCode(qrBox, {
@@ -270,14 +270,14 @@
     btnCopyLink.onclick = async ()=>{
       try{
         await navigator.clipboard.writeText(redeemUrl(c.code||''));
-        alert('?�????????????�?�?�?"?�?� ?????�?"?�?.?�?-?�?'???,?�?.?�???�?�?�?.?�?�');
-      }catch{ alert('?�???�?� ???"?�?'?�?�?�?�?�?.???????? ?????�?"?�?.?�?-?�?'???,?�?.?�???�?�?????????'); }
+        alert('Р РЋРЎРѓРЎвЂ№Р В»Р С”Р В° РЎРѓР С”Р С•Р С—Р С‘РЎР‚Р С•Р Р†Р В°Р Р…Р В°');
+      }catch{ alert('Р СњР Вµ РЎС“Р Т‘Р В°Р В»Р С•РЎРѓРЎРЉ РЎРѓР С”Р С•Р С—Р С‘РЎР‚Р С•Р Р†Р В°РЎвЂљРЎРЉ'); }
     };
 
     btnDownloadPng.onclick = ()=>{
-      // QRCode.js ???,?�?'???????"?�?�????? <img> ?�???�?.???"????????,?�?' qrBox
+      // QRCode.js РЎР‚Р С‘РЎРѓРЎС“Р ВµРЎвЂљ <img> Р Р†Р Р…РЎС“РЎвЂљРЎР‚Р С‘ qrBox
       const img = qrBox.querySelector('img') || qrBox.querySelector('canvas');
-      if (!img){ alert('QR ?�?.?�?� ?�?-?�?.??????�?.?�??'); return; }
+      if (!img){ alert('QR Р Р…Р Вµ Р С–Р С•РЎвЂљР С•Р Р†'); return; }
       const link = document.createElement('a');
       link.download = (c.code||'coupon') + '.png';
       link.href = img.src || img.toDataURL('image/png');
@@ -288,9 +288,9 @@
       const w = window.open('', '_blank');
       const img = qrBox.querySelector('img') || qrBox.querySelector('canvas');
       const src = img?.src || img?.toDataURL?.('image/png') || '';
-      w.document.write('<html><head><title>?�???�?�??????�?�????????? QR</title></head><body style="font-family:Inter,sans-serif;padding:24px;text-align:center">');
-      w.document.write('<div style="font-weight:800;margin-bottom:12px">'+escapeHtml(c.title||'?�?T???"?�?-?�?.?�?.')+'</div>');
-      w.document.write('<img src="'+src+'" style="width:260px;height:260px"/><div style="margin-top:10px">?�?T?�?.?�?': <b>'+escapeHtml(c.code||'')+'</b></div>');
+      w.document.write('<html><head><title>Р СџР ВµРЎвЂЎР В°РЎвЂљРЎРЉ QR</title></head><body style="font-family:Inter,sans-serif;padding:24px;text-align:center">');
+      w.document.write('<div style="font-weight:800;margin-bottom:12px">'+escapeHtml(c.title||'Р С™РЎС“Р С—Р С•Р Р…')+'</div>');
+      w.document.write('<img src="'+src+'" style="width:260px;height:260px"/><div style="margin-top:10px">Р С™Р С•Р Т‘: <b>'+escapeHtml(c.code||'')+'</b></div>');
       w.document.write('</body></html>');
       w.document.close(); w.focus(); w.print();
     };
@@ -374,7 +374,7 @@
       }
     });
     save(); render(); importInput.value='';
-    alert('?�?�?�?�?�?-?�?.???,????? ?�?�?�?�?�???�?�???,???,�????�?�?.');
+    alert('Р ВР СР С—Р С•РЎР‚РЎвЂљ Р В·Р В°Р Р†Р ВµРЎР‚РЎв‚¬РЎвЂР Р…');
   });
 
   // ====== Boot ======

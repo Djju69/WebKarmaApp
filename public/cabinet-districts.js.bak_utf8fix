@@ -1,0 +1,76 @@
+﻿(function(){
+  const data = [
+    { id:1, name:'Кофейня «У Ашота»',   category:'Кафе',     district:'Центр',  address:'Невский пр., 10',  discount:'-15%' },
+    { id:2, name:'Ресторан «МариВанна»', category:'Ресторан', district:'Север', address:'Ленина, 8',       discount:'-10%' },
+    { id:3, name:'Фитнес «Атлет»',      category:'Фитнес',   district:'Юг',    address:'Спортивная, 3',   discount:'-20%' },
+    { id:4, name:'Кафе «Какао»',        category:'Кафе',     district:'Юг',    address:'Победы, 5',       discount:'-5%'  },
+    { id:5, name:'Кафе «Ваниль»',       category:'Кафе',     district:'Центр', address:'Садовая, 12',     discount:'-12%' },
+    { id:6, name:'Ресторан «Триндово»', category:'Ресторан', district:'Север', address:'Парковая, 4',     discount:'-18%' }
+  ];
+
+  const qs = (s,sc=document)=>sc.querySelector(s);
+  const qsa = (s,sc=document)=>Array.from(sc.querySelectorAll(s));
+
+  const districtSel = qs('#districtSelect');
+  const categorySel = qs('#categorySelect');
+  const districtCount = qs('#districtCount');
+  const categoryCount = qs('#categoryCount');
+  const cardsEl = qs('#cards');
+  const statsEl = qs('#stats');
+
+  const LS_KEY = 'ks_filter_v1';
+  const saved = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+  if(saved.district) districtSel.value = saved.district;
+  if(saved.category) categorySel.value = saved.category;
+
+  function apply(){
+    const d = districtSel.value;
+    const c = categorySel.value;
+    const filtered = data.filter(x=>
+      (d==='all'||x.district===d) &&
+      (c==='all'||x.category===c)
+    );
+
+    // Рендер карточек
+    cardsEl.innerHTML = filtered.map(x=>
+      <div class="dcard">
+        <div class="dcard-h">
+          <div class="dcard-title"></div>
+          <span class="d-badge"></span>
+        </div>
+        <div class="dcard-sub"> · </div>
+        <div class="dcard-addr"></div>
+        <div class="dcard-actions">
+          <a class="btn xs" href="/cabinet/cards">Открыть</a>
+          <a class="btn xs outline" href="/cabinet/qr">Купоны</a>
+        </div>
+      </div>
+    ).join('');
+
+    // Счётчик рядом с селектом (сколько подходит)
+    districtCount.textContent = filtered.length;
+    categoryCount.textContent = filtered.length;
+
+    // Верхние статистики по районам
+    const total = data.length;
+    const cnt = {
+      'Центр': data.filter(x=>x.district==='Центр').length,
+      'Юг':    data.filter(x=>x.district==='Юг').length,
+      'Север': data.filter(x=>x.district==='Север').length
+    };
+    statsEl.innerHTML = 
+      <div class="dstat"><div class="dstat-v"></div><div class="dstat-l">Всего</div></div>
+      <div class="dstat"><div class="dstat-v"></div><div class="dstat-l">Центр</div></div>
+      <div class="dstat"><div class="dstat-v"></div><div class="dstat-l">Юг</div></div>
+      <div class="dstat"><div class="dstat-v"></div><div class="dstat-l">Север</div></div>
+    ;
+
+    // Сохраняем выбор
+    localStorage.setItem(LS_KEY, JSON.stringify({district:d, category:c}));
+  }
+
+  districtSel.addEventListener('change', apply);
+  categorySel.addEventListener('change', apply);
+  document.addEventListener('DOMContentLoaded', apply);
+  apply();
+})();
