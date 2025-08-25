@@ -1,4 +1,4 @@
-﻿?:root{
+:root{
   --bg:#fff; --ink:#111; --ink-2:#6B7280; --line:#E5E7EB; --muted:#F5F7FA;
   --radius:14px; --shadow:0 8px 30px rgba(17,17,17,.06);
 }
@@ -38,7 +38,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,syste
 .hero-card-title{font-size:22px;font-weight:800}
 @media (max-width:980px){.hero-grid{grid-template-columns:1fr} .hero-copy h1{font-size:36px}}
 
-/* TOP ?�?'?�?.???? ???,??? ?�?"?�?�???,???"?????�?�?�?�???? */
+/* TOP дня — карусель */
 .topday{padding:8px 0 16px}
 .topday-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .topday h2{font-size:22px;margin:0}
@@ -151,59 +151,4 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,syste
   .site-header.open #mainNav{display:flex}
   #mainNav .nav-list{flex-direction:column;align-items:stretch;gap:8px}
   #mainNav .nav-list a,.nav-cta{height:auto;padding:10px 12px;border-radius:10px}
-}
-/* MODAL BASICS */
-.modal[aria-hidden="true"]{display:none}
-.modal{position:fixed;inset:0;z-index:50}
-.modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:saturate(120%) blur(2px)}
-.modal__dialog{position:relative;z-index:1;max-width:720px;margin:6vh auto;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.25);display:flex;flex-direction:column}
-.modal__header,.modal__footer{padding:14px 16px;display:flex;align-items:center;gap:10px}
-.modal__header{border-bottom:1px solid rgba(0,0,0,.06)}
-.modal__footer{border-top:1px solid rgba(0,0,0,.06);justify-content:flex-end}
-.modal__title{font-weight:800}
-.modal__body{padding:14px 16px}
-.modal__close{border:none;background:transparent;font-size:22px;line-height:1;cursor:pointer}
-
-.form__row{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-.form__grid{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:12px}
-.req{color:#e11}
-
-.input{appearance:none;border:1px solid rgba(0,0,0,.14);border-radius:10px;padding:10px 12px;background:#fff;color:#111;outline:none}
-.input:focus{box-shadow:0 0 0 3px rgba(0,0,0,.05);border-color:#777}
-
-.btn{border:1px solid rgba(0,0,0,.14);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
-.btn:hover{background:#f4f4f4}
-.btn-primary{background:#111;color:#fff;border-color:#111}
-.btn-primary:hover{background:#000}
-.btn-danger{background:#fff;border-color:#d33;color:#d33}
-.btn-danger:hover{background:#ffecec}
-.btn-xs{padding:6px 8px;border-radius:8px;font-size:12px}
-
-.switch{position:relative;display:inline-block;width:44px;height:24px}
-.switch input{display:none}
-.slider{position:absolute;cursor:pointer;inset:0;background:#e5e7eb;border-radius:24px;transition:.2s}
-.slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
-.switch input:checked + .slider{background:#111}
-.switch input:checked + .slider:before{transform:translateX(20px)}
-
-@media (max-width:820px){
-  .form__grid{grid-template-columns:1fr}
-}
-/* QR small tweaks */
-code{background:rgba(0,0,0,.04);padding:2px 6px;border-radius:6px;border:1px solid rgba(0,0,0,.08)}
-/* MOBILE SIDEBAR v2 (dashboard) */
-.topbar .hamburger{display:none;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;border:1px solid var(--line,rgba(0,0,0,.12));background:#fff}
-.topbar .hamburger span{width:18px;height:2px;background:#222;display:block;position:relative}
-.topbar .hamburger span::before,.topbar .hamburger span::after{content:"";position:absolute;left:0;right:0;height:2px;background:#222}
-.topbar .hamburger span::before{top:-6px}.topbar .hamburger span::after{top:6px}
-
-.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:999}
-
-@media (max-width: 900px){
-  .dashboard-layout{grid-template-columns:1fr !important}
-  .sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;max-width:85%;transform:translateX(-100%);transition:transform .25s ease;z-index:1000;background:#fff}
-  .sidebar.open{transform:translateX(0)}
-  .sidebar-backdrop.visible{opacity:1;pointer-events:auto}
-  .topbar .hamburger{display:inline-flex}
-  body.menu-open{overflow:hidden}
 }

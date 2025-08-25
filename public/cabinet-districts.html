@@ -1,83 +1,45 @@
-﻿?<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <title>KarmaSystem - ??????</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Районы — KarmaSystem</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
 </head>
 <body class="dashboard-body">
   <div class="dashboard-layout">
     <aside class="sidebar">
-      <div class="sidebar-brand">
-        <div class="logo-img">
-          <img src="/assets/logo.png" onerror="this.style.display='none'" alt="KS" style="width:28px;height:28px;object-fit:contain"/>
-        </div>
+      <a class="sidebar-brand" href="/cabinet">
+        <div class="logo-img"><img src="/assets/logo.png" alt="KS" onerror="this.style.display='none'"/></div>
         <span class="brand-text">KarmaSystem</span>
-      </div>
+      </a>
       <nav class="sidebar-nav">
-        <a class="nav-item" href="/cabinet">?? ?????</a>
-        <a class="nav-item" href="/cabinet/cards">?? ????????</a>
-        <a class="nav-item" href="/cabinet/qr">?? QR/??????</a>
-        <a class="nav-item active" href="/cabinet/districts">?? ??????</a>
-        <a class="nav-item" href="/cabinet/reviews">? ??????</a>
-        <a class="nav-item" href="/cabinet/analytics">?? ?????????</a>
-        <a class="nav-item" href="/cabinet/integrations">?? ??????????</a>
-        <a class="nav-item" href="/cabinet/team">?? ???????</a>
-        <a class="nav-item" href="/cabinet/settings">?? ?????????</a>
-        <a class="nav-item" href="/cabinet/support">?? ?????????</a>
+        <a class="nav-item" href="/cabinet">🟢 Обзор</a>
+        <a class="nav-item" href="/cabinet/cards">📇 Карточки</a>
+        <a class="nav-item" href="/cabinet/qr">🧾 QR/Купоны</a>
+        <a class="nav-item active" href="/cabinet/districts">🧭 Районы</a>
+        <a class="nav-item" href="/cabinet/reviews">⭐ Отзывы</a>
+        <a class="nav-item" href="/cabinet/analytics">📈 Аналитика</a>
+        <a class="nav-item" href="/cabinet/integrations">🔌 Интеграции</a>
+        <a class="nav-item" href="/cabinet/team">👥 Команда</a>
+        <a class="nav-item" href="/cabinet/settings">⚙️ Настройки</a>
+        <a class="nav-item" href="/cabinet/support">🆘 Поддержка</a>
       </nav>
-      <footer class="sidebar-footer">� KarmaSystem</footer>
+      <footer class="sidebar-footer">© KarmaSystem</footer>
     </aside>
 
     <main class="dashboard-main">
       <header class="topbar">
-        <div class="topbar-title">??????</div>
-        <a href="/" class="btn btn-primary" style="margin-left:auto;margin-right:12px;">?? ???????</a>
-        <div class="profile-chip">?</div>
+        <div class="topbar-title">Районы</div>
+        <a href="/" class="btn btn-primary" style="margin-left:auto;">На главную</a>
+        <div class="profile-chip">Д</div>
       </header>
 
-      <div class="panel">
-        <div class="k-head">
-          <div>
-            <div class="k-title">????? ? ??????????</div>
-            <div class="k-sub">?????????? ???????? ?? ??????? ? ?????????. ????? ???????????.</div>
-          </div>
-          <div class="filter-row">
-            <label class="filter">
-              <span class="fl-label">?????</span>
-              <select id="districtSelect" class="fl-select">
-                <option value="all">??? ??????</option>
-                <option value="?????">?????</option>
-                <option value="??">??</option>
-                <option value="?????">?????</option>
-              </select>
-              <span class="count-pill" id="districtCount">0</span>
-            </label>
-            <label class="filter">
-              <span class="fl-label">?????????</span>
-              <select id="categorySelect" class="fl-select">
-                <option value="all">??? ?????????</option>
-                <option value="????">????</option>
-                <option value="????????">????????</option>
-                <option value="??????">??????</option>
-              </select>
-              <span class="count-pill" id="categoryCount">0</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="district-stats" id="stats">
-          <!-- ???? JS ??????? ???????? -->
-        </div>
-
-        <div class="district-grid" id="cards">
-          <!-- ???? JS ?????????? ???????? -->
-        </div>
-      </div>
+      <section class="panel">
+        <div class="k-note">Раздел «Районы» в разработке. Скажи, какой функционал делаем первым — подключу.</div>
+      </section>
     </main>
   </div>
-  <script src="/cabinet-districts.js"></script>
 </body>
 </html>
