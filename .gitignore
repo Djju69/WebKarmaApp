@@ -1,6 +1,12 @@
-.DS_Store
-node_modules
-npm-debug.log*
-dist
-build
+﻿node_modules/
+.npm-cache/
+.npm/
+*.log
+*.bak
+*.tmp
+*.swp
+dist/
+build/
 .env
+.DS_Store
+Thumbs.db
