@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:15-alpine
+    container_name: karmasystem-db
+    environment:
+      POSTGRES_USER: karmasystem
+      POSTGRES_PASSWORD: karmasystem
+      POSTGRES_DB: karmasystem
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U karmasystem -d karmasystem"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: karmasystem-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass your_redis_password
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: karmasystem-backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://karmasystem:karmasystem@db:5432/karmasystem
+      - REDIS_URL=redis://:your_redis_password@redis:6379/0
+      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=1440
+      - DEBUG=True
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: karmasystem-frontend
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  # PGAdmin (optional, for database management)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: karmasystem-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@karmasystem.app
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  # Redis Commander (optional, for Redis management)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: karmasystem-redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+      - REDIS_PASSWORD=your_redis_password
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
