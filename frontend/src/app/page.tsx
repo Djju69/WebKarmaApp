@@ -1,28 +1,27 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-black">
       {/* Hero Section */}
-      <section className="relative bg-white dark:bg-gray-900">
+      <section className="relative">
         <div className="container mx-auto px-4 py-16 md:py-24 lg:py-32">
           <div className="flex flex-col items-center text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
+            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
               Система лояльности для вашего бизнеса
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-gray-600 dark:text-gray-300">
+            <p className="mt-6 max-w-2xl text-lg leading-8">
               Привлекайте новых клиентов и поощряйте постоянных с помощью современной системы лояльности KarmaSystem.
               Простая интеграция, удобное управление и рост продаж.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Link
                 href="/register"
-                className="rounded-md bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                className="rounded-md bg-black px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:bg-white dark:text-black dark:hover:bg-gray-200"
               >
                 Начать бесплатно
               </Link>
-              <Link href="/catalog" className="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
+              <Link href="/catalog" className="text-sm font-semibold leading-6 border-b border-black dark:border-white">
                 Посмотреть каталог <span aria-hidden="true">→</span>
               </Link>
             </div>
@@ -31,13 +30,13 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-800 sm:py-24">
+      <section className="py-16 bg-gray-100 dark:bg-gray-900 sm:py-24">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Почему выбирают KarmaSystem?
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600 dark:text-gray-400">
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8">
               Инновационные решения для вашего бизнеса
             </p>
           </div>
