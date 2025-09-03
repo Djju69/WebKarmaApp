@@ -1,0 +1,114 @@
+# Sentry Alerts Configuration
+# Place this file in your project root and import it in your Sentry project settings
+
+# Critical Alerts (immediate notification)
+- name: Critical Errors
+  conditions:
+    - The issue is seen more than 5 times in 1h
+  actions:
+    - Send a notification to the #critical-alerts Slack channel
+    - Send an email to the devops team
+    - Trigger a PagerDuty incident
+  filters:
+    - The issue level is error or higher
+    - The environment is production
+
+# Error Alerts (notify during business hours)
+- name: New Errors
+  conditions:
+    - An issue is first seen
+  actions:
+    - Send a notification to the #alerts Slack channel
+    - Send an email to the team
+  filters:
+    - The issue level is error or higher
+    - The environment is production
+
+# Performance Alerts
+- name: Slow Endpoints
+  conditions:
+    - The p95(transaction.duration) of all transactions is greater than 2s
+  actions:
+    - Send a notification to the #performance-alerts Slack channel
+  filters:
+    - The environment is production
+
+# 404 Alerts
+- name: Frequent 404s
+  conditions:
+    - count() of events is greater than 100 in 1h
+  actions:
+    - Send a notification to the #web-alerts Slack channel
+  filters:
+    - The event type is error
+    - The exception type contains "Http404"
+    - The environment is production
+
+# Custom Alerts
+- name: Authentication Failures
+  conditions:
+    - count() of events is greater than 50 in 1h
+  actions:
+    - Send a notification to the #security-alerts Slack channel
+  filters:
+    - The event message contains "authentication failed"
+    - The environment is production
+
+- name: Database Connection Issues
+  conditions:
+    - An event is seen
+  actions:
+    - Send a notification to the #database-alerts Slack channel
+    - Create a Jira ticket
+  filters:
+    - The exception type contains "OperationalError"
+    - The exception value contains "could not connect"
+    - The environment is production
+
+# Release Monitoring
+- name: New Release Errors
+  conditions:
+    - An issue is first seen in release
+  actions:
+    - Send a notification to the #releases Slack channel
+  filters:
+    - The issue level is error or higher
+    - The environment is production
+
+# User Impact Alerts
+- name: High User Impact
+  conditions:
+    - The number of affected users is greater than 100 in 1h
+  actions:
+    - Send a notification to the #user-impact Slack channel
+  filters:
+    - The environment is production
+
+# Integration Alerts
+- name: External API Failures
+  conditions:
+    - count() of events is greater than 10 in 5m
+  actions:
+    - Send a notification to the #api-alerts Slack channel
+  filters:
+    - The event message contains "API request failed"
+    - The environment is production
+
+# Custom Metric Alerts
+- name: High Error Rate
+  conditions:
+    - The error rate is more than 5% in 5m
+  actions:
+    - Send a notification to the #error-rate-alerts Slack channel
+  filters:
+    - The environment is production
+
+# Alert for Missing Data
+- name: Missing Data
+  conditions:
+    - No events have been seen in the last 1h
+  actions:
+    - Send a notification to the #monitoring-alerts Slack channel
+  filters:
+    - The project matches your_project_name
+    - The environment is production
