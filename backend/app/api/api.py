@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from app.core.config import settings
 
 # Import all endpoint routers
-from app.api.endpoints import auth, users
+from app.api.endpoints import auth, users, cache, two_factor_router
 
 # Create the main API router
 api_router = APIRouter()
@@ -23,4 +23,25 @@ api_router.include_router(
     users.router,
     prefix="/users",
     tags=["users"]
+)
+
+# Include 2FA endpoints
+api_router.include_router(
+    two_factor_router,
+    prefix="/2fa",
+    tags=["2FA"]
+)
+
+# Include cache endpoints
+api_router.include_router(
+    cache.router,
+    prefix="/cache",
+    tags=["cache"]
+)
+
+# Include new 2FA endpoints
+api_router.include_router(
+    two_factor_router,
+    prefix="/2fa",
+    tags=["2FA"]
 )

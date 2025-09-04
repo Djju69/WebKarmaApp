@@ -2,7 +2,7 @@
 User model for the loyalty system with RBAC and multi-language support.
 """
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from enum import Enum
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Table, JSON
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -45,16 +45,32 @@ class User(Base):
     hashed_password = Column(String(255), nullable=True)  # For web authentication
     is_active = Column(Boolean(), default=True)
     is_verified = Column(Boolean(), default=False)  # Email verification
+    is_2fa_enabled = Column(Boolean(), default=False)  # 2FA status
+    totp_secret = Column(String(32), nullable=True)  # TOTP secret key
+    backup_codes = Column(JSON, nullable=True)  # Backup codes for 2FA
     preferred_language = Column(String(10), default='ru')  # ru, en, es, fr
     last_login = Column(DateTime, nullable=True)
+    
+    # Profile fields
+    bio = Column(String(500), nullable=True)
+    avatar_url = Column(String(512), nullable=True)
+    date_of_birth = Column(DateTime, nullable=True)
+    gender = Column(String(20), nullable=True)
+    country = Column(String(100), nullable=True)
+    city = Column(String(100), nullable=True)
+    
+    # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    email_verified_at = Column(DateTime, nullable=True)
     
     # Relationships
     loyalty_accounts = relationship("LoyaltyAccount", back_populates="user", lazy="selectin")
     transactions = relationship("Transaction", back_populates="user", lazy="selectin")
     roles = relationship("Role", secondary=user_roles, back_populates="users", lazy="selectin")
     audit_logs = relationship("AuditLog", back_populates="user", lazy="selectin")
+    login_attempts = relationship("UserLoginAttempt", back_populates="user", cascade="all, delete-orphan")
+    devices = relationship("UserDevice", back_populates="user", cascade="all, delete-orphan")
     # This is a hybrid property to get all permissions through roles
     @property
     def user_permissions(self):

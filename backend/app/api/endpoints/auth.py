@@ -195,20 +195,22 @@ async def register(
     response_description="Access token and token type",
     responses={
         200: {
-            "description": "Successful login",
+            "description": "Successful login or 2FA verification required",
             "content": {
                 "application/json": {
                     "example": {
-                        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                        "access_token": "string",
+                        "refresh_token": "string",
                         "token_type": "bearer",
-                        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                        "expires_in": 604800
+                        "requires_2fa": False,
+                        "is_2fa_verified": True
                     }
                 }
             }
         },
-        400: {"description": "Incorrect username or password"},
-        403: {"description": "Email not verified"},
+        400: {"description": "Incorrect username or password or invalid 2FA code"},
+        401: {"description": "Invalid or expired token"},
+        403: {"description": "Email not verified or 2FA verification required"},
         404: {"description": "User not found"},
         429: {"description": "Too many login attempts"}
     }
@@ -216,137 +218,421 @@ async def register(
 async def login(
     request: Request,
     db: Session = Depends(get_db),
-    form_data: OAuth2PasswordRequestForm = Depends()
-) -> Any:
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    code: Optional[str] = Body(None, embed=True)  # 2FA код (опционально для первого шага)
+):
     """
-    OAuth2 compatible token login, get an access token for future requests.
+    Аутентификация пользователя и получение токенов доступа.
+    
+    Если у пользователя включена 2FA, первый запрос вернет токен, требующий верификации 2FA.
+    Клиент должен запросить у пользователя код 2FA и отправить его в параметре `code`.
+    
+    Args:
+        request: Объект запроса
+        db: Сессия базы данных
+        form_data: Данные формы аутентификации (username, password)
+        code: Код двухфакторной аутентификации (опционально)
+        
+    Returns:
+        TokenResponse: Токены доступа и информация о пользователе
+        
+    Raises:
+        HTTPException: В случае ошибки аутентификации
     """
-    # Check if user exists
+    # Находим пользователя по email или username
     user = db.query(User).filter(
-        (User.email == form_data.username) | 
-        (User.username == form_data.username)
+        (User.email == form_data.username) | (User.username == form_data.username)
     ).first()
     
-    if not user:
+    # Проверяем существование пользователя и корректность пароля
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        # Логируем неудачную попытку входа
+        print(f"Неудачная попытка входа для пользователя: {form_data.username}")
+        
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Incorrect email or password"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Неверный email/username или пароль",
+            headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Check if password is correct
-    if not verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect email or password"
-        )
-    
-    # Check if email is verified
-    if not user.is_verified and settings.REQUIRE_EMAIL_VERIFICATION:
+    # Проверяем активность пользователя
+    if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Please verify your email address before logging in"
+            detail="Учетная запись неактивна"
         )
     
-    # Create tokens
+    # Если включена 2FA и код не предоставлен, возвращаем токен, требующий 2FA
+    if user.is_2fa_enabled and not code:
+        # Создаем токен с коротким сроком действия только для верификации 2FA
+        access_token_expires = timedelta(minutes=5)
+        access_token = create_access_token(
+            data={"sub": user.email or user.username},
+            expires_delta=access_token_expires,
+            is_2fa_verified=False,  # Отмечаем, что 2FA не пройдена
+            scope="2fa_required"    # Ограниченная область действия
+        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "requires_2fa": True,
+            "message": "Требуется двухфакторная аутентификация"
+        }
+    
+    # Если включена 2FA и предоставлен код, проверяем его
+    if user.is_2fa_enabled and code:
+        from app.services.two_factor_service import TwoFactorService
+        
+        try:
+            two_factor_service = TwoFactorService(db)
+            
+            # Проверяем код 2FA
+            is_valid = two_factor_service.verify_code(user.id, code)
+            
+            if not is_valid:
+                # Логируем неудачную попытку ввода кода 2FA
+                print(f"Неверный код 2FA для пользователя: {user.email or user.username}")
+                
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Неверный код двухфакторной аутентификации",
+                    headers={"WWW-Authenticate": "Bearer error=\"invalid_2fa\""},
+                )
+                
+            # Логируем успешную 2FA аутентификацию
+            print(f"Успешная 2FA аутентификация для пользователя: {user.email or user.username}")
+            
+        except Exception as e:
+            print(f"Ошибка при верификации 2FA: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Ошибка при проверке кода двухфакторной аутентификации"
+            )
+    
+    # Генерируем токены доступа и обновления
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=access_token_expires
-    )
-    
     refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    refresh_token = create_refresh_token(
-        data={"sub": str(user.id)},
-        expires_delta=refresh_token_expires
+    
+    # Получаем информацию о клиенте для привязки токена
+    user_agent = request.headers.get("user-agent", "")
+    client_host = request.client.host if request.client else "unknown"
+    
+    # Создаем access token с отметкой о прохождении 2FA
+    access_token = create_access_token(
+        data={"sub": user.email or user.username},
+        expires_delta=access_token_expires,
+        is_2fa_verified=user.is_2fa_enabled,  # Отмечаем, что 2FA пройдена (если включена)
+        user_agent=user_agent,
+        ip_address=client_host
     )
     
-    # Update last login
+    # Создаем refresh token
+    refresh_token = create_refresh_token(
+        data={"sub": user.email or user.username},
+        expires_delta=refresh_token_expires,
+        user_agent=user_agent,
+        ip_address=client_host
+    )
+    
+    # Обновляем время последнего входа
     user.last_login = datetime.utcnow()
     db.commit()
     
+    # Логируем успешный вход
+    print(f"Успешный вход пользователя: {user.email or user.username}")
+    
     return {
         "access_token": access_token,
-        "token_type": "bearer",
         "refresh_token": refresh_token,
-        "expires_in": int(access_token_expires.total_seconds())
+        "token_type": "bearer",
+        "requires_2fa": False,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "is_active": user.is_active,
+            "is_superuser": user.is_superuser,
+            "is_2fa_enabled": user.is_2fa_enabled,
+            "created_at": user.created_at,
+            "last_login": user.last_login
+        }
     }
 
 @router.post(
-    "/refresh",
+    "/verify-2fa",
     response_model=TokenResponse,
-    summary="Refresh Token",
-    description="Refresh an expired access token using a refresh token",
-    response_description="New access token and token type",
+    summary="Верификация 2FA кода",
+    description="Верификация кода двухфакторной аутентификации после начального входа",
+    response_description="Новые токены с подтвержденной 2FA",
     responses={
         200: {
-            "description": "Token refreshed successfully",
+            "description": "2FA успешно подтверждена",
             "content": {
                 "application/json": {
                     "example": {
-                        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                        "access_token": "string",
+                        "refresh_token": "string",
                         "token_type": "bearer",
-                        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                        "expires_in": 604800
+                        "is_2fa_verified": True,
+                        "user": {
+                            "id": 1,
+                            "email": "user@example.com",
+                            "username": "user123",
+                            "is_active": True,
+                            "is_2fa_enabled": True
+                        }
                     }
                 }
             }
         },
-        401: {
-            "description": "Invalid or expired refresh token",
-            "content": {
-                "application/json": {
-                    "example": {"detail": "Could not validate credentials"}
-                }
+        400: {"description": "Неверный или устаревший код 2FA"},
+        401: {"description": "Неверный или устаревший токен"},
+        403: {"description": "2FA не включена для этого пользователя"},
+        404: {"description": "Пользователь не найден"}
+    }
+)
+async def verify_2fa(
+    request: Request,
+    code: str = Body(..., embed=True, description="6-значный код из приложения аутентификатора"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Подтверждение кода двухфакторной аутентификации.
+    
+    Этот эндпоинт вызывается после успешного входа, если у пользователя включена 2FA.
+    
+    Args:
+        request: Объект запроса
+        code: 6-значный код из приложения аутентификатора
+        current_user: Текущий аутентифицированный пользователь
+        db: Сессия базы данных
+        
+    Returns:
+        TokenResponse: Новые токены с подтвержденной 2FA и информация о пользователе
+        
+    Raises:
+        HTTPException: В случае ошибки верификации
+    """
+    # Проверяем, включена ли 2FA для пользователя
+    if not current_user.is_2fa_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Двухфакторная аутентификация не включена для этого пользователя"
+        )
+    
+    # Получаем сервис 2FA
+    from app.services.two_factor_service import TwoFactorService
+    
+    try:
+        two_factor_service = TwoFactorService(db)
+        
+        # Проверяем код 2FA
+        is_valid = two_factor_service.verify_code(current_user.id, code)
+        
+        if not is_valid:
+            # Логируем неудачную попытку верификации
+            print(f"Неудачная попытка верификации 2FA для пользователя: {current_user.email or current_user.username}")
+            
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Неверный или устаревший код двухфакторной аутентификации"
+            )
+        
+        # Генерируем новые токены с подтвержденной 2FA
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        
+        # Получаем информацию о клиенте для привязки токена
+        user_agent = request.headers.get("user-agent", "")
+        client_host = request.client.host if request.client else "unknown"
+        
+        # Создаем новые токены с подтвержденной 2FA
+        access_token = create_access_token(
+            data={"sub": current_user.email or current_user.username},
+            expires_delta=access_token_expires,
+            is_2fa_verified=True,  # Подтверждаем прохождение 2FA
+            user_agent=user_agent,
+            ip_address=client_host
+        )
+        
+        refresh_token = create_refresh_token(
+            data={"sub": current_user.email or current_user.username},
+            expires_delta=refresh_token_expires,
+            user_agent=user_agent,
+            ip_address=client_host
+        )
+        
+        # Обновляем время последнего входа
+        current_user.last_login = datetime.utcnow()
+        db.commit()
+        
+        # Логируем успешную верификацию 2FA
+        print(f"Успешная верификация 2FA для пользователя: {current_user.email or current_user.username}")
+        
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "is_2fa_verified": True,
+            "user": {
+                "id": current_user.id,
+                "email": current_user.email,
+                "username": current_user.username,
+                "first_name": current_user.first_name,
+                "last_name": current_user.last_name,
+                "is_active": current_user.is_active,
+                "is_superuser": current_user.is_superuser,
+                "is_2fa_enabled": current_user.is_2fa_enabled,
+                "created_at": current_user.created_at,
+                "last_login": current_user.last_login
             }
         }
+        
+    except Exception as e:
+        # Логируем ошибку при верификации 2FA
+        print(f"Ошибка при верификации 2FA: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Произошла ошибка при верификации кода двухфакторной аутентификации"
+        )
+
+@router.post(
+    "/refresh",
+    response_model=TokenResponse,
+    summary="Обновление токена доступа",
+    description="Обновление истекшего токена доступа с использованием refresh токена",
+    response_description="Новый access token и refresh token",
+    responses={
+        200: {
+            "description": "Токен успешно обновлен",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "access_token": "string",
+                        "refresh_token": "string",
+                        "token_type": "bearer",
+                        "requires_2fa": False,
+                        "user": {
+                            "id": 1,
+                            "email": "user@example.com",
+                            "username": "user123",
+                            "is_active": True,
+                            "is_2fa_enabled": False
+                        }
+                    }
+                }
+            }
+        },
+        400: {"description": "Неверный или устаревший refresh токен"},
+        401: {"description": "Неверный или устаревший токен"},
+        403: {"description": "Пользователь неактивен или недостаточно прав"},
+        404: {"description": "Пользователь не найден"}
     }
 )
 async def refresh_token(
     request: Request,
     token_payload: TokenPayload,
     db: Session = Depends(get_db),
-) -> Any:
+):
     """
-    Refresh access token using a valid refresh token.
+    Обновление access token с использованием валидного refresh токена.
+    
+    Если у пользователя включена 2FA, новый access token будет требовать повторной верификации 2FA.
+    
+    Args:
+        request: Объект запроса
+        token_payload: Данные из refresh токена
+        db: Сессия базы данных
+        
+    Returns:
+        TokenResponse: Новые токены доступа и обновления
+        
+    Raises:
+        HTTPException: В случае ошибки обновления токена
     """
-    # Get user from token
-    user = db.query(User).filter(User.id == token_payload.sub).first()
-    if not user or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found or inactive"
-        )
-    
-    # Create new access token
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=access_token_expires
-    )
-    
-    # Create new refresh token
-    refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    refresh_token = create_refresh_token(
-        data={"sub": str(user.id)},
-        expires_delta=refresh_token_expires
-    )
-    
-    # Add old refresh token to blacklist
-    auth_header = request.headers.get("Authorization")
-    if auth_header:
-        scheme, token = auth_header.split()
-        if scheme.lower() == "bearer":
-            add_token_to_blacklist(
-                token,
-                int(refresh_token_expires.total_seconds())
+    try:
+        # Получаем пользователя из данных токена
+        user_identifier = token_payload.sub
+        user = db.query(User).filter(
+            (User.email == user_identifier) | (User.username == user_identifier)
+        ).first()
+        
+        # Проверяем существование и активность пользователя
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Пользователь не найден"
             )
-    
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "refresh_token": refresh_token,
-        "expires_in": int(access_token_expires.total_seconds())
-    }
+        
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Учетная запись неактивна"
+            )
+        
+        # Генерируем новые токены
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        
+        # Получаем информацию о клиенте для привязки токена
+        user_agent = request.headers.get("user-agent", "")
+        client_host = request.client.host if request.client else "unknown"
+        
+        # Создаем новый access token (потребует 2FA, если включена для пользователя)
+        access_token = create_access_token(
+            data={"sub": user_identifier},
+            expires_delta=access_token_expires,
+            is_2fa_verified=not user.is_2fa_enabled,  # Требуем 2FA, если она включена
+            user_agent=user_agent,
+            ip_address=client_host
+        )
+        
+        # Создаем новый refresh token с поддержкой ротации
+        refresh_token = create_refresh_token(
+            data={"sub": user_identifier},
+            expires_delta=refresh_token_expires,
+            user_agent=user_agent,
+            ip_address=client_host,
+            rotation_enabled=True  # Включаем ротацию токенов
+        )
+        
+        # Логируем успешное обновление токена
+        print(f"Токен обновлен для пользователя: {user.email or user.username}")
+        
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "requires_2fa": user.is_2fa_enabled,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "is_active": user.is_active,
+                "is_superuser": user.is_superuser,
+                "is_2fa_enabled": user.is_2fa_enabled,
+                "created_at": user.created_at,
+                "last_login": user.last_login
+            }
+        }
+        
+    except HTTPException:
+        # Пробрасываем известные исключения дальше
+        raise
+        
+    except Exception as e:
+        # Логируем неизвестные ошибки
+        print(f"Ошибка при обновлении токена: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Произошла ошибка при обновлении токена"
+        )
 
 @router.post(
     "/verify-email",

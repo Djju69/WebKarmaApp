@@ -3,7 +3,8 @@ Base database configuration and session management.
 """
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker, scoped_session, Session
+from typing import Generator
 from app.core.config import settings
 
 # Create database engine
@@ -22,10 +23,18 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Base class for all models
 Base = declarative_base()
 
-def get_db():
-    """Dependency function that yields database sessions."""
-    db = scoped_session(SessionLocal)
+def get_db() -> Generator[Session, None, None]:
+    """
+    Dependency function that yields database sessions.
+    
+    Yields:
+        Session: A database session
+    """
+    db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+# Export for use in other modules
+__all__ = ["Base", "SessionLocal", "engine", "get_db"]

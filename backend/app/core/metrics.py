@@ -197,7 +197,6 @@ class PrometheusMiddleware:
             track_request_count(method, path, status_code)
             track_request_in_progress(method, path, in_progress=False)
     
-    @staticmethod
     def get_path(self, scope):
         """Get the request path, handling path parameters."""
         route = scope.get("route")

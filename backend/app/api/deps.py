@@ -1,15 +1,15 @@
 """
 Dependencies for API endpoints.
 """
-from typing import List, Optional
+from typing import List, Optional, Generator, Any
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
-from app.db.base import get_db
+from app.db.base import SessionLocal, engine
 from app.models.user import User, Role, Permission
 from app.schemas.token import TokenPayload
 
@@ -17,6 +17,20 @@ from app.schemas.token import TokenPayload
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login"
 )
+
+# Dependency to get DB session
+def get_db() -> Generator[Session, None, None]:
+    """
+    Dependency that provides a database session.
+    
+    Yields:
+        Session: A database session
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 async def get_current_user(
     db: Session = Depends(get_db),

@@ -42,17 +42,28 @@ class Settings(BaseSettings):
     SQLITE_DB: str = "sqlite:///./karmasystem.db"
     DATABASE_URI: str = SQLITE_DB
     
+    # Redis settings
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_PASSWORD: Optional[str] = None
+    REDIS_CACHE_EXPIRE: int = 300  # 5 минут по умолчанию
+    
+    # Request validation settings
+    ENABLE_REQUEST_VALIDATION: bool = True  # Включить/выключить валидацию запросов
+    VALIDATION_ERROR_DETAIL: str = "Ошибка валидации запроса"  # Сообщение об ошибке валидации
+    
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
         return cls.SQLITE_DB
         
-    # Redis settings
-    REDIS_HOST: str = "localhost"
-    REDIS_PORT: int = 6379
-    REDIS_DB: int = 0
-    REDIS_PASSWORD: Optional[str] = None
+    @property
+    def redis_url(self) -> str:
+        """Возвращает URL для подключения к Redis"""
+        auth = f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
+        return f"redis://{auth}{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
     
     # JWT settings
     SECRET_KEY: str = "your-secret-key-here"  # Change this in production

@@ -20,7 +20,17 @@ test_settings = Settings(
     DEBUG=True,
     ENVIRONMENT="testing",
     SQLITE_DB="sqlite:///./test.db",
-    DATABASE_URI="sqlite:///./test.db"
+    DATABASE_URI="sqlite:///./test.db",
+    # Используем локальный Redis с несуществующим хостом, чтобы тесты не подключались к реальному Redis
+    REDIS_HOST="localhost.test",
+    REDIS_PORT=6379,
+    REDIS_DB=0,
+    REDIS_PASSWORD="",
+    # Отключаем внешние сервисы для тестов
+    SENTRY_DSN=None,
+    OTEL_EXPORTER_OTLP_ENDPOINT=None,
+    # Упрощаем логирование для тестов
+    LOG_LEVEL="WARNING"
 )
 
 # Переопределяем глобальные настройки
@@ -45,6 +55,49 @@ def override_get_db():
     finally:
         db.close()
 
+# Мок для Redis
+class MockRedis:
+    def __init__(self, *args, **kwargs):
+        self.data = {}
+        
+    async def get(self, key):
+        return self.data.get(key)
+        
+    async def set(self, key, value, ex=None):
+        self.data[key] = value
+        return True
+        
+    async def delete(self, key):
+        if key in self.data:
+            del self.data[key]
+        return True
+        
+    async def exists(self, key):
+        return key in self.data
+        
+    # Add other Redis methods that might be used
+    async def ping(self):
+        return True
+        
+    async def close(self):
+        pass
+
+# Мок для Redis Manager
+class MockRedisManager:
+    def __init__(self):
+        self.redis = MockRedis()
+        self.is_connected = True
+        
+    async def init_redis_cache(self):
+        self.is_connected = True
+        return self.redis
+        
+    async def close_redis(self):
+        self.is_connected = False
+        
+    def get_redis(self):
+        return self.redis
+
 # Создаем тестовое приложение
 def create_test_application():
     # Импортируем здесь, чтобы избежать циклического импорта
@@ -53,6 +106,9 @@ def create_test_application():
     
     # Создаем тестовое приложение
     app = FastAPI()
+    
+    # Мокируем Redis
+    app.state.redis_manager = MockRedisManager()
     
     # Простой эндпоинт для проверки работы
     @app.get("/test")
@@ -66,14 +122,159 @@ def create_test_application():
     # Импортируем и подключаем основные роутеры
     from app.api.v1.api import api_router as v1_router
     from app.api.endpoints import auth as auth_router
+    from app.api.endpoints import two_factor_router
     
     app.include_router(v1_router, prefix="/api/v1")
     app.include_router(auth_router.router, prefix="/auth")
+    app.include_router(two_factor_router, prefix="/2fa")
     
     return app
 
 # Создаем тестовое приложение
 app = create_test_application()
+
+# Мокаем Redis на уровне модуля
+import sys
+from unittest.mock import MagicMock, AsyncMock, patch, PropertyMock
+
+# Патчим redis на уровне модуля, чтобы перехватить все вызовы
+sys.modules['redis'] = MagicMock()
+sys.modules['redis.asyncio'] = MagicMock()
+
+# Создаем мок для Redis клиента с поддержкой синхронных и асинхронных операций
+class MockRedisClient:
+    def __init__(self, *args, **kwargs):
+        self.data = {}
+        self.ping = AsyncMock(return_value=True)
+        
+    # Синхронные методы
+    def get(self, key, *args, **kwargs):
+        return self.data.get(key)
+        
+    def set(self, key, value, *args, **kwargs):
+        self.data[key] = value
+        return True
+        
+    def delete(self, key, *args, **kwargs):
+        if key in self.data:
+            del self.data[key]
+        return True
+        
+    def exists(self, key, *args, **kwargs):
+        return key in self.data
+        
+    # Асинхронные методы
+    async def aget(self, key, *args, **kwargs):
+        return self.get(key, *args, **kwargs)
+        
+    async def aset(self, key, value, *args, **kwargs):
+        return self.set(key, value, *args, **kwargs)
+        
+    async def adelete(self, key, *args, **kwargs):
+        return self.delete(key, *args, **kwargs)
+        
+    async def aexists(self, key, *args, **kwargs):
+        return self.exists(key, *args, **kwargs)
+        
+    # Поддержка вызова как асинхронного контекстного менеджера
+    async def __aenter__(self):
+        return self
+        
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        pass
+        
+    # Поддержка Redis pipeline
+    def pipeline(self):
+        return MockRedisPipeline(self)
+
+# Класс для эмуляции Redis pipeline
+class MockRedisPipeline:
+    def __init__(self, redis_client):
+        self.redis = redis_client
+        self.commands = []
+        self.results = []
+        
+    def __enter__(self):
+        return self
+        
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+        
+    def incr(self, key, amount=1):
+        self.commands.append(('incr', key, amount))
+        # Возвращаем self для поддержки цепочки вызовов
+        return self
+        
+    def expire(self, key, time):
+        self.commands.append(('expire', key, time))
+        return self
+        
+    def execute(self):
+        results = []
+        for cmd in self.commands:
+            if cmd[0] == 'incr':
+                key = cmd[1]
+                amount = cmd[2]
+                current = int(self.redis.get(key) or 0)
+                new_val = current + amount
+                self.redis.set(key, str(new_val))
+                results.append(new_val)
+            elif cmd[0] == 'expire':
+                # В тестах просто игнорируем expire
+                results.append(True)
+        self.commands = []
+        return results
+
+# Создаем мок для redis_manager с поддержкой синхронных и асинхронных операций
+class MockRedisManager:
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.redis = MockRedisClient()
+            cls._instance.is_connected = True
+        return cls._instance
+    
+    async def init_redis_cache(self):
+        self.is_connected = True
+        return self.redis
+        
+    async def close_redis(self):
+        self.is_connected = False
+        
+    def get_redis(self):
+        return self.redis
+        
+    # Добавляем алиасы для асинхронных методов, если они используются
+    async def aget(self, key, *args, **kwargs):
+        return self.redis.get(key, *args, **kwargs)
+        
+    async def aset(self, key, value, *args, **kwargs):
+        return self.redis.set(key, value, *args, **kwargs)
+        
+    async def adelete(self, key, *args, **kwargs):
+        return self.redis.delete(key, *args, **kwargs)
+        
+    async def aexists(self, key, *args, **kwargs):
+        return self.redis.exists(key, *args, **kwargs)
+
+# Применяем патчи
+mock_redis_manager = MockRedisManager()
+
+# Применяем патчи
+mock_redis_manager = MockRedisManager()
+
+# Импортируем redis_manager, чтобы заменить его на мок
+from app.core.redis import redis_manager as actual_redis_manager
+actual_redis_manager.redis = mock_redis_manager.redis
+
+# Устанавливаем мок в приложение
+app.state.redis_manager = mock_redis_manager
+
+# Мокаем Redis в security модуле
+import app.core.security as security
+security.redis_client = mock_redis_manager.redis
 
 # Создаем таблицы в тестовой базе данных
 @pytest.fixture(scope="session", autouse=True)
@@ -82,73 +283,47 @@ def create_test_db():
     # Создаем все таблицы
     Base.metadata.create_all(bind=engine)
     
-    yield  # Тесты выполняются здесь
+    # Патчим Redis для всех тестов
+    with patch('app.core.redis.redis_manager', app.state.redis_manager):
+        yield  # Тесты выполняются здесь
     
-    # Закрываем все соединения с базой данных
-    from sqlalchemy import event
-    from sqlalchemy.pool import NullPool
-    
-    # Принудительно закрываем все соединения
-    engine.dispose()
-    
-    # Удаляем таблицы
+    # Удаляем все таблицы после выполнения тестов
     Base.metadata.drop_all(bind=engine)
     
-    # Пытаемся удалить файл базы данных, если он существует
-    db_path = "test.db"
-    if os.path.exists(db_path):
+    # Удаляем файл базы данных
+    if os.path.exists("test.db"):
         try:
-            # Пытаемся удалить файл
-            os.unlink(db_path)
+            os.remove("test.db")
         except PermissionError:
-            # Игнорируем ошибки доступа, если файл заблокирован
+            # Игнорируем ошибки удаления файла в Windows
             pass
 
 # Фикстура для тестового клиента
-@pytest.fixture(scope="module")
+@pytest.fixture
 def test_client():
-    with TestClient(app) as client:
-        yield client
+    # Применяем патч для Redis в каждом тесте
+    with patch('app.core.redis.redis_manager', app.state.redis_manager):
+        with TestClient(app) as client:
+            yield client
 
 # Фикстура для сессии базы данных
-@pytest.fixture(scope="function")
+@pytest.fixture
 def db_session():
+    """Фикстура для сессии базы данных."""
     connection = engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
     
-    yield session
+    # Применяем патч для Redis в каждой сессии
+    with patch('app.core.redis.redis_manager', app.state.redis_manager):
+        yield session
     
     session.close()
     transaction.rollback()
     connection.close()
 
 # Фикстура для тестового пользователя
-@pytest.fixture(scope="function")
-def test_user(db_session):
-    from app.models.user import User
-    from app.core.security import get_password_hash
-    
-    user = User(
-        email="test@example.com",
-        hashed_password=get_password_hash("testpass123"),
-        is_active=True,
-        is_superuser=False,
-    )
-    db_session.add(user)
-    
-    # Create permissions if they don't exist
-    created_permissions = {}
-    for perm_data in permissions:
-        permission = db_session.query(Permission).filter(Permission.name == perm_data["name"]).first()
-        if not permission:
-            permission = Permission(**perm_data)
-            db_session.add(permission)
-            db_session.commit()
-            db_session.refresh(permission)
-        created_permissions[perm_data["name"]] = permission
-    
-    yield created_permissions
+# (Удалена дублирующаяся фикстура, используем полную реализацию ниже)
     
     # Cleanup is handled by the database session
 

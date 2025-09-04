@@ -37,49 +37,72 @@ from app.api.endpoints import auth as auth_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Контекстный менеджер для управления жизненным циклом приложения."""
+    """
+    Контекстный менеджер для управления жизненным циклом приложения.
+    Инициализирует Redis при запуске и корректно закрывает соединение при остановке.
+    """
     # Код, выполняемый при запуске
     logger.info("Запуск приложения...")
     
-    # Здесь можно добавить инициализацию подключений к БД и других ресурсов
+    # Инициализация Redis
+    from app.core.redis import redis_manager
+    logger.info("Инициализация Redis...")
+    await redis_manager.init_redis_cache()
+    logger.info("Redis успешно инициализирован")
     
-    yield  # Приложение работает
-    
-    # Код, выполняемый при остановке
-    logger.info("Остановка приложения...")
-    # Здесь можно добавить корректное закрытие подключений
+    try:
+        yield  # Приложение работает
+    finally:
+        # Код, выполняемый при остановке
+        logger.info("Остановка приложения...")
+        # Закрываем соединение с Redis
+        await redis_manager.close()
+        logger.info("Соединение с Redis закрыто")
 
 def create_application() -> FastAPI:
-    """Создание и настройка FastAPI приложения."""
-    # Создаем экземпляр FastAPI с настройками
+    """
+    Создание и настройка FastAPI приложения.
+    """
+    # Настраиваем маршрутизацию с использованием кастомного класса маршрута
+    route_class = None
+    if settings.ENABLE_REQUEST_VALIDATION:
+        from app.api.middleware import ValidatedRoute
+        route_class = ValidatedRoute
+    
     app = FastAPI(
         title=settings.PROJECT_NAME,
-        description="KarmaSystem Bot API",
+        description="API для KarmaSystem Bot",
         version=settings.VERSION,
+        openapi_url=f"{settings.API_V1_STR}/openapi.json",
+        docs_url="/docs",
+        redoc_url="/redoc",
         debug=settings.DEBUG,
-        docs_url=None if settings.ENVIRONMENT == "production" else "/docs",
-        redoc_url=None if settings.ENVIRONMENT == "production" else "/redoc",
-        openapi_url=f"{settings.API_V1_STR}/openapi.json" if settings.DEBUG else None,
-        lifespan=lifespan
+        lifespan=lifespan,
+        route_class=route_class
     )
     
     # Настройка CORS
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # В продакшене заменить на конкретные домены
+        allow_origins=settings.BACKEND_CORS_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
     
-    # Добавление middleware для метрик
-    app.add_middleware(PrometheusMiddleware, app_name=settings.PROJECT_NAME)
+    # Добавляем middleware для метрик
+    app.add_middleware(PrometheusMiddleware)
     
-    # Регистрация роутеров
+    # Настраиваем маршруты
     setup_routers(app)
     
-    # Обработчики ошибок
+    # Настраиваем обработчики исключений
     setup_exception_handlers(app)
+    
+    # Добавляем обработчик для проверки работоспособности
+    @app.get("/health")
+    async def health_check():
+        return {"status": "ok", "version": settings.VERSION}
     
     return app
 
