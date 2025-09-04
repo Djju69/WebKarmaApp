@@ -3,7 +3,7 @@ Loyalty service for managing points and tiers.
 """
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Any
+from typing import Dict, List, Optional, Any
 from sqlalchemy.orm import Session
 
 from app.core.config import settings

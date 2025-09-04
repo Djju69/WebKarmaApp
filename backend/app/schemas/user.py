@@ -2,8 +2,8 @@
 User related schemas.
 """
 from datetime import datetime
-from typing import List, Optional
-from pydantic import BaseModel, EmailStr, Field, validator, constr, HttpUrl, root_validator
+from typing import Any, List, Optional
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator, constr, HttpUrl
 
 from app.models.user import User as UserModel
 
@@ -27,11 +27,11 @@ class UserBase(BaseModel):
         min_length=USERNAME_MIN_LENGTH,
         max_length=USERNAME_MAX_LENGTH,
         strip_whitespace=True,
-        to_lower=True
+        to_lower=True,
+        pattern=r'^[a-zA-Z0-9_]+$'
     )] = Field(
         None,
         description=f"Username must be {USERNAME_MIN_LENGTH}-{USERNAME_MAX_LENGTH} characters long and can only contain letters, numbers, and underscores.",
-        regex=r'^[a-zA-Z0-9_]+$',
         example="johndoe"
     )
     is_active: Optional[bool] = Field(
@@ -89,11 +89,11 @@ class UserCreate(UserBase):
         min_length=USERNAME_MIN_LENGTH,
         max_length=USERNAME_MAX_LENGTH,
         strip_whitespace=True,
-        to_lower=True
+        to_lower=True,
+        pattern=r'^[a-zA-Z0-9_]+$'
     ) = Field(
         ...,
         description=f"Username must be {USERNAME_MIN_LENGTH}-{USERNAME_MAX_LENGTH} characters long and can only contain letters, numbers, and underscores.",
-        regex=r'^[a-zA-Z0-9_]+$',
         example="johndoe"
     )
     role_ids: Optional[List[int]] = Field(
@@ -102,8 +102,9 @@ class UserCreate(UserBase):
         example=[1, 2]
     )
     
-    @validator('password')
-    def validate_password_strength(cls, v):
+    @field_validator('password')
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
         """Validate password strength."""
         if len(v) < PASSWORD_MIN_LENGTH:
             raise ValueError(f'Password must be at least {PASSWORD_MIN_LENGTH} characters long')
@@ -119,13 +120,13 @@ class UserCreate(UserBase):
             raise ValueError('Password must contain at least one special character')
         return v
     
-    @validator('email')
-    def validate_email_domain(cls, v):
+    @field_validator('email')
+    @classmethod
+    def validate_email_domain(cls, v: str) -> str:
         """Validate email domain."""
-        # Add any domain-specific validation here if needed
-        # For example, block disposable email domains
-        disposable_domains = {'example.com', 'mailinator.com'}
-        domain = v.split('@')[-1].lower()
+        # Example: Block disposable email domains
+        disposable_domains = {'yopmail.com', 'mailinator.com', 'tempmail.com'}
+        domain = v.split('@')[-1]
         if domain in disposable_domains:
             raise ValueError('Disposable email addresses are not allowed')
         return v
@@ -149,19 +150,21 @@ class UserUpdate(UserBase):
         example=[1, 2]
     )
     
-    @validator('password')
-    def validate_password_change(cls, v, values):
+    @field_validator('password')
+    @classmethod
+    def validate_password_change(cls, v: Optional[str], info: Any) -> Optional[str]:
         """Validate password change requirements."""
-        if v is not None and 'current_password' not in values:
+        if v is not None and not info.data.get('current_password'):
             raise ValueError('Current password is required to change the password')
         return v
     
-    @root_validator
-    def validate_update_fields(cls, values):
+    @model_validator(mode='after')
+    def validate_update_fields(self) -> 'UserUpdate':
         """Validate that at least one field is being updated."""
-        if all(v is None for k, v in values.items() if k not in ('password', 'current_password')):
+        data = self.model_dump(exclude_unset=True)
+        if not any(k in data for k in self.model_fields if k not in ('password', 'current_password')):
             raise ValueError('At least one field must be provided for update')
-        return values
+        return self
 
 
 class UserInDBBase(UserBase):

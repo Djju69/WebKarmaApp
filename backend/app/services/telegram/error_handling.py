@@ -14,7 +14,7 @@ from telegram.error import (
     TimedOut,
     BadRequest,
     Conflict,
-    Unauthorized
+    Forbidden
 )
 
 from app.core.config import settings

@@ -1,18 +1,32 @@
-""
+"""
 Security utilities for authentication and authorization.
 """
+import time
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union, List
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, status, Request
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security.utils import get_authorization_scheme_param
 from sqlalchemy.orm import Session
+import redis
+from ratelimit import limits, sleep_and_retry
 
 from app.core.config import settings
 from app.db.base import get_db
 from app.models.user import User
+from app.schemas.token import TokenData
+
+# Initialize Redis for rate limiting and token blacklist
+redis_client = redis.Redis(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    db=settings.REDIS_DB,
+    password=settings.REDIS_PASSWORD or None,
+    decode_responses=True
+)
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -29,6 +43,49 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     """Generate a password hash."""
     return pwd_context.hash(password)
+
+
+def verify_token_blacklist(token: str) -> bool:
+    """Check if token is blacklisted."""
+    return bool(redis_client.get(f"blacklist:{token}"))
+
+
+def add_token_to_blacklist(token: str, expire_seconds: int) -> None:
+    """Add token to blacklist."""
+    redis_client.setex(f"blacklist:{token}", expire_seconds, "blacklisted")
+
+
+def create_verification_token(email: str, token_type: str = "verify") -> str:
+    """Create an email verification or password reset token."""
+    expires_delta = timedelta(minutes=settings.EMAIL_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + expires_delta
+    
+    to_encode = {
+        "sub": email,
+        "exp": expire,
+        "type": token_type
+    }
+    
+    return jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM
+    )
+
+
+def verify_verification_token(token: str, token_type: str) -> Optional[str]:
+    """Verify email verification or password reset token."""
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM]
+        )
+        if payload.get("type") != token_type:
+            return None
+        return payload.get("sub")
+    except JWTError:
+        return None
 
 def create_access_token(
     data: Dict[str, Any], 
@@ -70,16 +127,27 @@ def create_refresh_token(
     )
     return encoded_jwt
 
+@sleep_and_retry
+@limits(calls=100, period=300)  # 100 calls per 5 minutes
 async def get_current_user(
+    request: Request,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
 ) -> User:
-    """Get the current authenticated user."""
+    """Get the current authenticated user with rate limiting."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    # Check token blacklist
+    if verify_token_blacklist(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has been revoked",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     
     try:
         payload = jwt.decode(
@@ -96,23 +164,63 @@ async def get_current_user(
         if user_id is None:
             raise credentials_exception
             
-    except JWTError:
-        raise credentials_exception
+    except JWTError as e:
+        raise credentials_exception from e
+        
+    # Rate limiting by IP and user ID
+    ip = request.client.host
+    user_attempts = redis_client.incr(f"auth_attempts:{ip}:{user_id}")
+    if user_attempts > settings.MAX_AUTH_ATTEMPTS:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many requests",
+            headers={"Retry-After": "900"},  # 15 minutes cooldown
+        )
     
+    # Reset counter after successful authentication
+    if user_attempts > 0:
+        redis_client.delete(f"auth_attempts:{ip}:{user_id}")
+    
+    # Get user from database
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise credentials_exception
         
+    # Check if user is active
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is inactive",
+        )
+        
+    # Check if email is verified
+    if not user.is_verified and settings.REQUIRE_EMAIL_VERIFICATION:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Please verify your email address",
+        )
+        
     return user
 
 async def get_current_active_user(
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ) -> User:
     """Get the current active user."""
     if not current_user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
-            detail="Inactive user"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This account has been deactivated"
+        )
+    return current_user
+
+async def get_current_active_superuser(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Get the current active superuser."""
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The user doesn't have enough privileges"
         )
     return current_user
 

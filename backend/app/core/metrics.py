@@ -1,6 +1,7 @@
 """
 Prometheus metrics configuration.
 """
+from fastapi import APIRouter
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, REGISTRY
 from prometheus_client.openmetrics.exposition import CONTENT_TYPE_LATEST
 from starlette.requests import Request
@@ -10,6 +11,17 @@ from typing import Callable, List, Optional, Tuple
 import time
 
 from app.core.config import settings
+
+# Create a router for metrics
+metrics_router = APIRouter()
+
+@metrics_router.get("/metrics", response_class=Response)
+async def metrics():
+    """Expose Prometheus metrics."""
+    return Response(
+        content=generate_latest(),
+        media_type=CONTENT_TYPE_LATEST
+    )
 
 # Disable default metrics
 REGISTRY.unregister(REGISTRY._names_to_collectors['python_gc_objects_collected_total'])
@@ -186,14 +198,29 @@ class PrometheusMiddleware:
             track_request_in_progress(method, path, in_progress=False)
     
     @staticmethod
-    def get_path(scope) -> str:
+    def get_path(self, scope):
         """Get the request path, handling path parameters."""
-        path = scope["path"]
+        route = scope.get("route")
+        if not route:
+            return scope["path"]
         
-        # Handle path parameters
-        for route in scope["app"].routes:
-            match, _ = route.matches(scope)
-            if match == Match.FULL:
-                return route.path
+        path = route.path
+        if hasattr(route, "endpoint") and hasattr(route.endpoint, "__module__"):
+            path = f"{route.endpoint.__module__}.{route.endpoint.__name__}"
         
         return path
+
+# Export public API
+__all__ = [
+    'PrometheusMiddleware',
+    'REQUEST_COUNT',
+    'REQUEST_LATENCY',
+    'REQUEST_IN_PROGRESS',
+    'get_metrics_response',
+    'track_request_duration',
+    'track_request_count',
+    'track_request_in_progress',
+    'track_error',
+    'track_db_query',
+    'metrics_router'
+]

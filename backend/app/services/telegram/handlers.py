@@ -22,7 +22,7 @@ from app.db.session import SessionLocal
 from .error_handling import error_handler
 
 # Import command handlers
-from .handlers.loyalty_commands import register_handlers as register_loyalty_handlers
+from .loyalty_commands import register_handlers as register_loyalty_handlers
 
 logger = logging.getLogger(__name__)
 
@@ -194,7 +194,13 @@ async def handle_start_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
 @command_handler.command("help")
 async def handle_help_command(update: Update, context: CallbackContext) -> None:
-    """Handle /help command."""
+    """
+    Handle /help command.
+    
+    Args:
+        update: The incoming update
+        context: The context object
+    """
     if context.args and len(context.args) > 0:
         # Show help for specific command
         command = context.args[0].lower()
@@ -222,11 +228,14 @@ async def handle_help_command(update: Update, context: CallbackContext) -> None:
                 "Использование: /history"
             )
         }
-    
-    Args:
-        update: The incoming update
-        context: The context object
-    """
+        
+        help_text = help_texts.get(command, "Команда не найдена. Введите /help для просмотра списка команд.")
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=help_text,
+            parse_mode='Markdown'
+        )
+        return
     if not update.effective_chat:
         logger.warning("Received help command without chat information")
         return

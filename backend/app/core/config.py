@@ -27,6 +27,14 @@ class Settings(BaseSettings):
     # Error tracking
     SENTRY_DSN: Optional[str] = None
     
+    # OpenTelemetry settings
+    OTEL_SERVICE_NAME: str = "karmasystem-bot"
+    OTEL_EXPORTER_OTLP_ENDPOINT: Optional[str] = None
+    OTEL_EXPORTER_OTLP_INSECURE: bool = True
+    OTEL_PYTHON_EXCLUDED_URLS: str = "/health,/metrics,/health/liveness,/health/readiness"
+    OTEL_TRACES_SAMPLER: str = "parentbased_always_on"
+    OTEL_PYTHON_LOG_CORRELATION: bool = True
+    
     # CORS settings
     BACKEND_CORS_ORIGINS: List[str] = ["*"]  # In production, specify exact origins
     
@@ -39,6 +47,35 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         return cls.SQLITE_DB
+        
+    # Redis settings
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_PASSWORD: Optional[str] = None
+    
+    # JWT settings
+    SECRET_KEY: str = "your-secret-key-here"  # Change this in production
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30  # 30 days
+    EMAIL_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
+    
+    # Security settings
+    REQUIRE_EMAIL_VERIFICATION: bool = True
+    MAX_AUTH_ATTEMPTS: int = 5  # Max login attempts before temporary lockout
+    ACCOUNT_LOCKOUT_MINUTES: int = 15  # Lockout duration in minutes
+    
+    # Email settings (for verification and password reset)
+    SMTP_SERVER: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    EMAIL_FROM: str = "noreply@karmasystem.app"
+    
+    # Rate limiting
+    RATE_LIMIT_REQUESTS: int = 100
+    RATE_LIMIT_PERIOD: int = 300  # 5 minutes in seconds
     
     # Telegram settings
     TELEGRAM_BOT_TOKEN: Optional[str] = None

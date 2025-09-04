@@ -49,7 +49,7 @@ def capture_exception(
     level: str = "error",
     **kwargs,
 ) -> None:
-    ""
+    """
     Capture an exception with additional context.
     
     Args:
