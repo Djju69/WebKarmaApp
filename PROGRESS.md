@@ -5,37 +5,37 @@
 ## Общий прогресс: 55%
 
 ### 1. Инфраструктура (45%)
-- [x] <span style="color: green;">Инициализация Next.js с TypeScript (100%)</span>
-- [x] <span style="color: green;">Настройка ESLint и Prettier (100%)</span>
-- [x] <span style="color: green;">Конфигурация Tailwind CSS (100%)</span>
-- [x] <span style="color: green;">Базовая структура проекта (100%)</span>
-- [x] <span style="color: green;">Настройка тестирования (100%)</span>
-- [x] <span style="color: green;">Настройка CI/CD (100%)</span>
-- [x] <span style="color: green;">Развертывание на Railway (100%)</span>
-- [x] <span style="color: green;">Настройка мониторинга (Sentry, Prometheus, Grafana) (100%)</span>
-- [x] <span style="color: green;">Настройка алертов (Alertmanager) (100%)</span>
-- [x] <span style="color: green;">Планирование масштабирования (100%)</span>
+- [x] **Инициализация Next.js с TypeScript (100%)** :white_check_mark:
+- [x] **Настройка ESLint и Prettier (100%)** :white_check_mark:
+- [x] **Конфигурация Tailwind CSS (100%)** :white_check_mark:
+- [x] **Базовая структура проекта (100%)** :white_check_mark:
+- [x] **Настройка тестирования (100%)** :white_check_mark:
+- [x] **Настройка CI/CD (100%)** :white_check_mark:
+- [x] **Развертывание на Railway (100%)** :white_check_mark:
+- [x] **Настройка мониторинга (Sentry, Prometheus, Grafana) (100%)** :white_check_mark:
+- [x] **Настройка алертов (Alertmanager) (100%)** :white_check_mark:
+- [x] **Планирование масштабирования (100%)** :white_check_mark:
 
 ### 2. Бэкенд (40%)
 #### 2.1. API (40%)
-- [x] <span style="color: green;">Базовая структура FastAPI (100%)</span>
-- [x] <span style="color: green;">Настройка аутентификации (JWT) (100%)</span>
-- [x] <span style="color: green;">Интеграция с PostgreSQL (100%)</span>
+- [x] **Базовая структура FastAPI (100%)** :white_check_mark:
+- [x] **Настройка аутентификации (JWT) (100%)** :white_check_mark:
+- [x] **Интеграция с PostgreSQL (100%)** :white_check_mark:
 - [ ] Интеграция с Redis (0%)
-- [x] <span style="color: green;">Документация OpenAPI (50%)</span>
+- [x] **Документация OpenAPI (50%)** :white_check_mark:
 
 #### 2.2. База данных (50%)
-- [x] <span style="color: green;">Основные модели данных (100%)</span>
-- [x] <span style="color: green;">Модель пользователя с RBAC (100%)</span>
+- [x] **Основные модели данных (100%)** :white_check_mark:
+- [x] **Модель пользователя с RBAC (100%)** :white_check_mark:
 - [ ] Модели для перевода (0%)
 - [ ] Модели для контента (0%)
-- [x] <span style="color: green;">Миграции (Alembic) (100%)</span>
-- [x] <span style="color: green;">Фикстуры для тестов (100%)</span>
+- [x] **Миграции (Alembic) (100%)** :white_check_mark:
+- [x] **Фикстуры для тестов (100%)** :white_check_mark:
 - [ ] Резервное копирование (0%)
 
 ### 3. Фронтенд (5%)
 #### 3.1. Базовые компоненты (20%)
-- [x] <span style="color: green;">UI-кит (50%)</span>
+- [x] **UI-кит (50%)** :white_check_mark:
 - [ ] Система тем (0%)
 - [ ] Адаптивная верстка (0%)
 - [ ] Локализация (i18n) (0%)
