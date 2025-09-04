@@ -136,26 +136,166 @@ def test_user(db_session):
         is_superuser=False,
     )
     db_session.add(user)
-    db_session.commit()
-    db_session.refresh(user)
     
-    return user
+    # Create permissions if they don't exist
+    created_permissions = {}
+    for perm_data in permissions:
+        permission = db_session.query(Permission).filter(Permission.name == perm_data["name"]).first()
+        if not permission:
+            permission = Permission(**perm_data)
+            db_session.add(permission)
+            db_session.commit()
+            db_session.refresh(permission)
+        created_permissions[perm_data["name"]] = permission
+    
+    yield created_permissions
+    
+    # Cleanup is handled by the database session
 
-# Fixture for test user
-@pytest.fixture(scope="function")
-def test_user(db_session):
-    from app.models.user import User
-    from app.core.security import get_password_hash
+# Fixture for test role
+@pytest.fixture
+def test_role(db_session, test_permissions):
+    """Fixture to create a test role with permissions."""
+    from app.models.user import Role, Permission
     
-    user = User(
-        email="test@example.com",
-        username="testuser",
-        hashed_password=get_password_hash("testpassword"),
-        is_active=True,
-        is_verified=True
-    )
-    db_session.add(user)
+    # Create a test role if it doesn't exist
+    role = db_session.query(Role).filter(Role.name == "test_role").first()
+    
+    if not role:
+        role = Role(
+            name="test_role",
+            description="Test role for unit testing"
+        )
+        db_session.add(role)
+        db_session.commit()
+        db_session.refresh(role)
+    
+    # Required permissions for role management
+    required_permissions = [
+        test_permissions["role:create"],
+        test_permissions["role:read"],
+        test_permissions["role:update"],
+        test_permissions["role:delete"],
+        test_permissions["permission:read"],
+    ]
+    
+    # Test permissions
+    test_perm_list = [
+        test_permissions["test:read"],
+        test_permissions["test:write"],
+        test_permissions["test:delete"],
+    ]
+    
+    # Combine all permissions
+    all_permissions = required_permissions + test_perm_list
+    
+    # Set permissions for the role
+    role.permissions = all_permissions
+    db_session.add(role)
     db_session.commit()
-    db_session.refresh(user)
+    db_session.refresh(role)
+    
+    return role
+
+# Fixture for test permissions
+@pytest.fixture
+def test_permissions(db_session):
+    """Fixture to create test permissions."""
+    from app.models.user import Permission
+    
+    # Define all required permissions for role management
+    permission_defs = [
+        # Role management permissions (from RBAC decorators)
+        {"name": "role:create", "description": "Create roles", "module": "auth"},
+        {"name": "role:read", "description": "View roles", "module": "auth"},
+        {"name": "role:update", "description": "Update roles", "module": "auth"},
+        {"name": "role:delete", "description": "Delete roles", "module": "auth"},
+        
+        # Permission management
+        {"name": "permission:read", "description": "View permissions", "module": "auth"},
+        
+        # Test permissions
+        {"name": "test:read", "description": "Test read permission", "module": "test"},
+        {"name": "test:write", "description": "Test write permission", "module": "test"},
+        {"name": "test:delete", "description": "Test delete permission", "module": "test"},
+    ]
+    
+    created_permissions = {}
+    
+    for perm_def in permission_defs:
+        # Check if permission already exists
+        permission = db_session.query(Permission).filter(
+            Permission.name == perm_def["name"]
+        ).first()
+        
+        if not permission:
+            permission = Permission(**perm_def)
+            db_session.add(permission)
+            db_session.commit()
+            db_session.refresh(permission)
+        
+        created_permissions[perm_def["name"]] = permission
+    
+    return created_permissions
+
+# Fixture for test user with role
+@pytest.fixture
+def test_user(db_session, test_role, test_permissions):
+    """Fixture to create a test user with admin role and all necessary permissions."""
+    from app.core.security import get_password_hash
+    from app.models.user import User, Role, Permission
+    
+    # Get all permissions from the test_permissions fixture
+    all_permissions = list(test_permissions.values())
+    
+    # Create an admin role with all permissions if it doesn't exist
+    admin_role = db_session.query(Role).filter(Role.name == "admin").first()
+    if not admin_role:
+        admin_role = Role(name="admin", description="Administrator role")
+        # Add all permissions to admin role
+        admin_role.permissions = all_permissions
+        db_session.add(admin_role)
+        db_session.commit()
+        db_session.refresh(admin_role)
+    else:
+        # Ensure the admin role has all permissions
+        admin_role.permissions = all_permissions
+        db_session.add(admin_role)
+        db_session.commit()
+        db_session.refresh(admin_role)
+    
+    # Create a test admin user if it doesn't exist
+    user = db_session.query(User).filter(User.email == "admin@example.com").first()
+    
+    if not user:
+        user = User(
+            email="admin@example.com",
+            username="admin",
+            hashed_password=get_password_hash("adminpass"),
+            is_active=True,
+            is_verified=True
+        )
+        # Add admin role to the user
+        user.roles = [admin_role]
+        db_session.add(user)
+        db_session.commit()
+        db_session.refresh(user)
+    
+    # Ensure the user has the admin role with all permissions
+    if admin_role not in user.roles:
+        user.roles.append(admin_role)
+        db_session.add(user)
+        db_session.commit()
+        db_session.refresh(user)
+    
+    # Ensure the admin role has all permissions
+    admin_role = db_session.query(Role).filter(Role.name == "admin").first()
+    admin_role.permissions = all_permissions
+    db_session.add(admin_role)
+    db_session.commit()
+    db_session.refresh(admin_role)
+    
+    # Refresh the user to get the latest role permissions
+    user = db_session.query(User).filter(User.email == "admin@example.com").first()
     
     return user

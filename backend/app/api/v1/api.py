@@ -5,6 +5,7 @@ from fastapi import APIRouter
 
 # Import all endpoint modules
 from .endpoints import telegram
+from ..endpoints import auth, users, roles
 
 # Create API router
 api_router = APIRouter()
@@ -16,7 +17,23 @@ api_router.include_router(
     tags=["telegram"]
 )
 
-# Example of including other routers
-# api_router.include_router(users.router, prefix="/users", tags=["users"])
-# api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
-# api_router.include_router(items.router, prefix="/items", tags=["items"])
+# Authentication endpoints
+api_router.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["auth"]
+)
+
+# User management endpoints
+api_router.include_router(
+    users.router,
+    prefix="/users",
+    tags=["users"]
+)
+
+# Role and permission management endpoints
+api_router.include_router(
+    roles.router,
+    prefix="/roles",
+    tags=["roles"]
+)
