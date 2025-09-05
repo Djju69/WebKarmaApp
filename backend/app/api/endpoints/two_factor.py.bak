@@ -1,0 +1,403 @@
+"""
+Two-Factor Authentication (2FA) endpoints.
+"""
+from fastapi import APIRouter, Depends, HTTPException, status, Request, BackgroundTasks
+from sqlalchemy.orm import Session
+from typing import Optional
+
+from app.core.security import get_current_user
+from app.models.user import User
+from app.schemas.two_factor import (
+    TwoFactorSetupResponse,
+    TwoFactorVerifyRequest,
+    TwoFactorEnableRequest,
+    TwoFactorDisableRequest,
+    TwoFactorBackupCodesResponse,
+    TwoFactorStatusResponse
+)
+from app.core.security.two_factor import (
+    setup_2fa_for_user,
+    verify_2fa_code,
+    enable_2fa_for_user,
+    disable_2fa_for_user,
+    regenerate_backup_codes as regen_backup_codes
+)
+from app.core.database import get_db
+
+router = APIRouter(prefix="/2fa", tags=["2FA"])
+
+@router.post(
+    "/setup",
+    response_model=TwoFactorSetupResponse,
+    status_code=status.HTTP_200_OK,
+    summary="                                                                          ",
+    description="                                                                                                          2FA",
+    response_description="                                       2FA (QR-      ,                            ,                            )",
+    responses={
+        200: {"description": "2FA                                  "},
+        400: {"description": "2FA                        "},
+        401: {"description": "                           "}
+    }
+)
+async def setup_2fa(
+    background_tasks: BackgroundTasks,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> TwoFactorSetupResponse:
+    """
+                                                                              .
+    
+                                                                                                              2FA.
+                                     ,                                                                                                     .
+    """
+    if current_user.is_2fa_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="2FA                                                           "
+        )
+    
+    try:
+        #                                                 , QR-                                     
+        setup_data = setup_2fa_for_user(db, current_user)
+        return setup_data
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="                                                          2FA"
+        )
+
+@router.post(
+    "/enable",
+    status_code=status.HTTP_200_OK,
+    summary="                                                                          ",
+    description="                     2FA                                                                                                        ",
+    responses={
+        200: {"description": "2FA                                        "},
+        400: {"description": "                                                          2FA                                "},
+        401: {"description": "                           "},
+        403: {"description": "                             "}
+    }
+)
+async def enable_2fa(
+    enable_data: TwoFactorEnableRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+                                                                              .
+    
+                                                                                                                                                       ,
+                                                         2FA.
+    """
+    if current_user.is_2fa_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="2FA                                                           "
+        )
+    
+    if not current_user.totp_secret:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="                                  2FA,                                    /2fa/setup"
+        )
+    
+    try:
+        #                                                                              2FA
+        if not enable_2fa_for_user(db, current_user, enable_data.code):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="                                                  "
+            )
+        
+        return {"status": "success", "message": "2FA                                        "}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="                                                          2FA"
+        )
+    
+    #                      2FA
+    current_user.is_2fa_enabled = True
+    db.commit()
+
+@router.post(
+    "/verify",
+    status_code=status.HTTP_200_OK,
+    summary="                                                     2FA",
+    description="                                                                                                             ",
+    responses={
+        200: {"description": "                                            "},
+        400: {"description": "                                                  "},
+        401: {"description": "                           "}
+    }
+)
+async def verify_2fa(
+    verify_data: TwoFactorVerifyRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+    Проверка двухфакторной аутентификации.
+    
+    Требует подтверждения кода 2FA.
+    """
+    #                                                                                     
+    background_tasks.add_task(
+        send_2fa_enabled_email,
+        email_to=current_user.email,
+        username=current_user.username,
+        ip_address=client_ip
+    )
+    
+    return {"message": "                                                                                               "}
+
+@router.post(
+    "/disable",
+    status_code=status.HTTP_200_OK,
+    summary="                                                                            ",
+    description="                   2FA                                                 ",
+    responses={
+        200: {"description": "2FA                                  "},
+        400: {"description": "                                     2FA                              "},
+        401: {"description": "                           "},
+        403: {"description": "                                              2FA"}
+    }
+)
+async def disable_2fa(
+    background_tasks: BackgroundTasks,
+    request: Request,
+    disable_request: TwoFactorDisableRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    two_factor_service: TwoFactorService = Depends(get_two_factor_service)
+):
+    """
+                                                                                .
+    
+                                                                                      ,          2FA               ,                                    .
+    """
+    if not current_user.is_2fa_enabled and not current_user.totp_secret:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="                                                                               "
+        )
+    
+    client_ip = request.client.host if request.client else "unknown"
+    
+    #                                                         
+    if not verify_password(disable_request.password, current_user.hashed_password):
+        #                                                                           
+        logger.warning(
+            "Failed 2FA disable attempt (wrong password) for user %s from IP %s",
+            current_user.id,
+            client_ip
+        )
+        
+        #                                                                                                 
+        background_tasks.add_task(
+            send_suspicious_activity_alert,
+            email_to=current_user.email,
+            username=current_user.username,
+            activity_type="failed_2fa_disable_password",
+            ip_address=client_ip,
+            user_agent=request.headers.get("user-agent", "")
+        )
+        
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="                             "
+        )
+    
+    #          2FA               ,                                                     
+    if current_user.is_2fa_enabled:
+        if not disable_request.code:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="                                                     2FA"
+            )
+            
+        is_valid, message = await two_factor_service.verify_2fa(
+            user=current_user,
+            code=disable_request.code,
+            request_ip=client_ip
+        )
+        
+        if not is_valid:
+            #                                                                       
+            logger.warning(
+                "Failed 2FA disable attempt (wrong code) for user %s from IP %s",
+                current_user.id,
+                client_ip
+            )
+            
+            #                                                                                                 
+            background_tasks.add_task(
+                send_suspicious_activity_alert,
+                email_to=current_user.email,
+                username=current_user.username,
+                activity_type="failed_2fa_disable_code",
+                ip_address=client_ip,
+                user_agent=request.headers.get("user-agent", "")
+            )
+            
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=message or "                                                  "
+            )
+    
+    #                    2FA                               
+    current_user.is_2fa_enabled = False
+    current_user.totp_secret = None
+    current_user.backup_codes = []
+    
+    db.commit()
+    
+    #                                                                      
+    background_tasks.add_task(
+        send_2fa_disabled_email,
+        email_to=current_user.email,
+        username=current_user.username,
+        ip_address=client_ip
+    )
+    
+    return {"message": "                                                                                         "}
+
+@router.get(
+    "/status",
+    response_model=TwoFactorStatusResponse,
+    summary="                                  2FA",
+    description="                                                                                                                                 ",
+    response_description="             2FA                                                                           ",
+    responses={
+        200: {"description": "                                                   2FA"},
+        401: {"description": "                           "}
+    }
+)
+async def get_2fa_status(
+    current_user: User = Depends(get_current_user),
+    two_factor_service: TwoFactorService = Depends(get_two_factor_service)
+) -> TwoFactorStatusResponse:
+    """
+                                                                                                              .
+    
+                                                       ,                       2FA,                                   
+                                                      .
+    """
+    #                   ,                         2FA (                                                                )
+    is_2fa_setup = current_user.totp_secret is not None
+    
+    #                                                                                         
+    backup_codes_remaining = len(current_user.backup_codes or [])
+    
+    #                   ,                     2FA (                                      )
+    is_2fa_active = current_user.is_2fa_enabled and is_2fa_setup
+    
+    #                                                                                    2FA (                         )
+    last_2fa_change = getattr(current_user, 'two_factor_last_changed', None)
+    
+    return TwoFactorStatusResponse(
+        is_2fa_enabled=is_2fa_active,
+        is_2fa_setup=is_2fa_setup,
+        backup_codes_remaining=backup_codes_remaining,
+        last_2fa_change=last_2fa_change
+    )
+
+@router.post(
+    "/regenerate-backup-codes",
+    response_model=TwoFactorBackupCodesResponse,
+    status_code=status.HTTP_200_OK,
+    summary="                                                           ",
+    description="                                                                                                                          ",
+    response_description="                                                     ",
+    responses={
+        200: {"description": "                                                                 "},
+        400: {"description": "2FA                                                     "},
+        401: {"description": "                           "},
+        403: {"description": "                                              2FA"}
+    }
+)
+async def regenerate_backup_codes(
+    background_tasks: BackgroundTasks,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    two_factor_service: TwoFactorService = Depends(get_two_factor_service)
+) -> TwoFactorBackupCodesResponse:
+    """
+                                                                                                                              .
+    
+                                                                            ,                                                   
+                                                                                                                      .
+    
+              :                                                                                                                                                                .
+    """
+    if not current_user.totp_secret:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="                                                                                         "
+        )
+    
+    client_ip = request.client.host if request.client else "unknown"
+    
+    #          2FA                 ,                                                                     
+    if current_user.is_2fa_enabled:
+        #                                                                                                            X-2FA-Code
+        code = request.headers.get("X-2FA-Code")
+        if not code:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="                                              2FA.                                             X-2FA-Code."
+            )
+            
+        #                                                     
+        is_valid, message = await two_factor_service.verify_2fa(
+            user=current_user,
+            code=code,
+            request_ip=client_ip
+        )
+        
+        if not is_valid:
+            #                                                                       
+            logger.warning(
+                "Failed backup codes regeneration attempt (wrong code) for user %s from IP %s",
+                current_user.id,
+                client_ip
+            )
+            
+            #                                                                                                 
+            background_tasks.add_task(
+                send_suspicious_activity_alert,
+                email_to=current_user.email,
+                username=current_user.username,
+                activity_type="failed_backup_codes_regeneration",
+                ip_address=client_ip,
+                user_agent=request.headers.get("user-agent", "")
+            )
+            
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=message or "                                                  "
+            )
+    
+    #                                                            
+    backup_codes = await two_factor_service.regenerate_backup_codes(current_user)
+    
+    #                                                               
+    db.commit()
+    
+    #                                                                                                           
+    background_tasks.add_task(
+        send_2fa_backup_codes_email,
+        email_to=current_user.email,
+        username=current_user.username,
+        ip_address=client_ip,
+        backup_codes=backup_codes
+    )
+    
+    return TwoFactorBackupCodesResponse(backup_codes=backup_codes)
+
